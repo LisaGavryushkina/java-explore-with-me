@@ -14,7 +14,7 @@ public class HitForRequestDto {
     private final String uri;
     @NotNull
     private final String ip;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @NotNull
     private final LocalDateTime timestamp;
 
 }

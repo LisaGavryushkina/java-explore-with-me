@@ -49,10 +49,12 @@ public interface StatsRepository extends JpaRepository<Hit, Integer> {
             " group by uri " +
             " order by count(h.ip) desc ")
     List<HitsByUri> findAllHitsByDate(LocalDateTime start, LocalDateTime end);
-    
+
     interface HitsByUri {
         String getApp();
+
         String getUri();
+
         int getHits();
     }
 }

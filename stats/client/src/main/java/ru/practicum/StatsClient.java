@@ -21,7 +21,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 @Service
 public class StatsClient {
 
-    private final String STATS_SERVER_URL = "http://stats-server:9090";
+    private static final String STATS_SERVER_URL = "http://stats-server:9090";
     private final RestTemplate rest;
 
     @Autowired
