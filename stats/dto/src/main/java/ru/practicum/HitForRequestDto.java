@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 @Data
@@ -15,8 +14,7 @@ public class HitForRequestDto {
     private final String uri;
     @NotNull
     private final String ip;
-    @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime timestamp;
 
 }

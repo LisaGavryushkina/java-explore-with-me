@@ -10,8 +10,8 @@ services:
       - stats-db
     environment:
       - SPRING_STATS_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/stats
-      - POSTGRES_STATS_USER=root
-      - POSTGRES_STATS_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
 
   stats-db:
@@ -23,8 +23,8 @@ services:
       - /var/lib/postgresql/data/
     environment:
       - POSTGRES_STATS_DB=stats
-      - POSTGRES_STATS_USER=root
-      - POSTGRES_STATS_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
 
   ewm-service:
@@ -39,8 +39,8 @@ services:
     environment:
       - STATS_SERVER_URL=http://stats-server:9090
       - SPRING_MAIN_DATASOURCE_URL=jdbc:postgresql://ewm-db:5500/ewm
-      - POSTGRES_MAIN_USER=root
-      - POSTGRES_MAIN_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
 
   ewm-db:
@@ -52,6 +52,6 @@ services:
       - /var/lib/postgresql/data/
     environment:
       - POSTGRES_MAIN_DB=ewm
-      - POSTGRES_MAIN_USER=root
-      - POSTGRES_MAIN_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
