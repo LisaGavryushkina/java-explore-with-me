@@ -20,7 +20,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Hit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

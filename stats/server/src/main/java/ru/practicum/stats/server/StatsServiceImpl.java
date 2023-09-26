@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class StatsServiceImpl implements StatsService {
     private final StatsRepository statsRepository;
     private final HitMapper hitMapper;
 
+    @Transactional
     @Override
     public void addHit(HitForRequestDto hitForRequestDto) {
         Hit saved = statsRepository.save(hitMapper.toHit(hitForRequestDto));
