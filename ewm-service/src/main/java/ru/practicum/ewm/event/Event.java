@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -37,16 +39,16 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "confirmedRequests", nullable = false)
+    @Column(name = "confirmed_requests", nullable = false)
     private int confirmedRequests;
 
-    @Column(name = "createdOn", nullable = false)
+    @Column(name = "created", nullable = false)
     private LocalDateTime createdOn;
 
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "eventDate", nullable = false)
+    @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,19 +61,20 @@ public class Event {
     @Column(name = "longitude", nullable = false)
     private long lon;
 
-    @Column(name = "paid", nullable = false)
+    @Column(name = "is_paid", nullable = false)
     private boolean paid;
 
-    @Column(name = "participantLimit", nullable = false)
+    @Column(name = "participant_limit", nullable = false)
     private int participantLimit;
 
-    @Column(name = "publishedOn", nullable = false)
+    @Column(name = "published", nullable = false)
     private LocalDateTime publishedOn;
 
-    @Column(name = "requestModeration", nullable = false)
+    @Column(name = "request_moderation", nullable = false)
     private boolean requestModeration;
 
-    @Column(name = "state", nullable = false)
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "state", nullable = false)
     private State state;
 
     @Column(name = "title", nullable = false)

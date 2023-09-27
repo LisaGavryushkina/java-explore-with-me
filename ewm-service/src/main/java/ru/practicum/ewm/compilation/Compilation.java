@@ -29,7 +29,7 @@ public class Compilation {
     @Column(name = "events_id", nullable = false)
     private Set<Integer> events;
 
-    @Column(name = "pinned", nullable = false)
+    @Column(name = "is_pinned", nullable = false)
     private boolean pinned;
 
     @Column(name = "title", nullable = false)
