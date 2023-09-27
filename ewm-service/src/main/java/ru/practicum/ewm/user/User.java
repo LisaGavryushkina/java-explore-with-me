@@ -1,6 +1,4 @@
-package ru.practicum.stats.server;
-
-import java.time.LocalDateTime;
+package ru.practicum.ewm.user;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,34 +10,28 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "hit")
+@Table(name = "users")
 @Data
-public class Hit {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private final int id;
 
-    @Column(name = "app", nullable = false)
-    private final String app;
+    @Column(name = "name", nullable = false)
+    private final String name;
 
-    @Column(name = "uri", nullable = false)
-    private final String uri;
-
-    @Column(name = "ip", nullable = false)
-    private final String ip;
-
-    @Column(name = "visited", nullable = false)
-    private final LocalDateTime visited;
+    @Column(name = "email", nullable = false)
+    private final String email;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Hit)) {
+        if (!(o instanceof User)) {
             return false;
         }
-        return id == ((Hit) o).getId();
+        return id == ((User) o).getId();
     }
 
     @Override
