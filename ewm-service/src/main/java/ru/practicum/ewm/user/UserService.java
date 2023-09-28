@@ -7,5 +7,5 @@ public interface UserService {
 
     UserDto addUser(UserDto user);
 
-    void deleteUser(int userId);
+    User deleteUser(int userId);
 }

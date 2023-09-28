@@ -1,12 +1,11 @@
 package ru.practicum.ewm.compilation;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -27,11 +26,11 @@ public class CompilationAndEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "compilation_id", nullable = false)
     private Compilation compilation;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 

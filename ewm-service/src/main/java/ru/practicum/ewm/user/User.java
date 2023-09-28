@@ -6,22 +6,30 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Table(name = "users")
-@Data
+@Table(name = "users"
+, uniqueConstraints = @UniqueConstraint(columnNames = {"name", "email"}))
+@NoArgsConstructor
+@ToString
+@Getter
+@AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final int id;
+    private int id;
 
     @Column(name = "name", nullable = false)
-    private final String name;
+    private String name;
 
     @Column(name = "email", nullable = false)
-    private final String email;
+    private String email;
 
     @Override
     public boolean equals(Object o) {
