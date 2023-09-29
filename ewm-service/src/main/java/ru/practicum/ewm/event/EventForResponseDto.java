@@ -9,21 +9,21 @@ import ru.practicum.ewm.user.UserDto;
 @Data
 public class EventForResponseDto {
 
-    private int id;
-    private String annotation;
-    private CategoryDto category;
-    private int confirmedRequests;
-    private LocalDateTime createdOn;
-    private String description;
-    private LocalDateTime eventDate;
-    private UserDto initiator;
-    private Location location;
-    private boolean paid;
-    private int participantLimit;
-    private LocalDateTime publishedOn;
-    private boolean requestModeration;
-    private State state;
-    private String title;
-    private int views;
+    private final int id;
+    private final String annotation;
+    private final CategoryDto category;
+    private final int confirmedRequests;
+    private final LocalDateTime createdOn;
+    private final String description;
+    private final LocalDateTime eventDate;
+    private final UserDto initiator;
+    private final Location location;
+    private final boolean paid;
+    private final int participantLimit;
+    private final LocalDateTime publishedOn;
+    private final boolean requestModeration;
+    private final State state;
+    private final String title;
+    private final int views;
 
 }

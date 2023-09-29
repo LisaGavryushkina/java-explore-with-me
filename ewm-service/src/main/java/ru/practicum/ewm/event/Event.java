@@ -39,9 +39,6 @@ public class Event {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(name = "confirmed_requests", nullable = false)
-    private int confirmedRequests;
-
     @Column(name = "created", nullable = false)
     private LocalDateTime createdOn;
 
@@ -79,9 +76,6 @@ public class Event {
 
     @Column(name = "title", nullable = false)
     private String title;
-
-    @Column(name = "views", nullable = false)
-    private int views;
 
     @Override
     public boolean equals(Object o) {
