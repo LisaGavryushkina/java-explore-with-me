@@ -5,6 +5,8 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,6 +20,18 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return ResponseEntity.status(e.getStatus())
                 .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        StringBuilder str = new StringBuilder();
+        for (ObjectError error : e.getAllErrors()) {
+            str.append(error.getDefaultMessage());
+        }
+        String errorMessage = str.toString();
+        log.error(errorMessage);
+        return new ErrorResponse(errorMessage);
     }
 
     @ExceptionHandler

@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class Event {
     private int id;
 
     @Column(name = "annotation", nullable = false)
+    @Size(max = 650)
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,6 +45,7 @@ public class Event {
     private LocalDateTime createdOn;
 
     @Column(name = "description", nullable = false)
+    @Size(max = 650)
     private String description;
 
     @Column(name = "event_date", nullable = false)
@@ -64,7 +67,7 @@ public class Event {
     @Column(name = "participant_limit", nullable = false)
     private int participantLimit;
 
-    @Column(name = "published", nullable = false)
+    @Column(name = "published")
     private LocalDateTime publishedOn;
 
     @Column(name = "request_moderation", nullable = false)

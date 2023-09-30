@@ -1,4 +1,4 @@
-package ru.practicum;
+package ru.practicum.client;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import ru.practicum.dto.HitForRequestDto;
+import ru.practicum.dto.HitForResponseDto;
 
 import static java.util.stream.Collectors.toList;
 

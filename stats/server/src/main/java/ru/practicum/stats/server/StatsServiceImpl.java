@@ -9,8 +9,8 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.HitForRequestDto;
-import ru.practicum.HitForResponseDto;
+import ru.practicum.dto.HitForRequestDto;
+import ru.practicum.dto.HitForResponseDto;
 
 import static ru.practicum.stats.server.StatsRepository.HitsByUri;
 
