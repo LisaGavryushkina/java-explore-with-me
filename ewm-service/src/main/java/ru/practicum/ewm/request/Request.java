@@ -17,6 +17,7 @@ import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.user.User;
@@ -46,6 +47,7 @@ public class Request {
 
     @Enumerated(EnumType.STRING)
     @JoinColumn(name = "status", nullable = false)
+    @Setter
     private Status status;
 
     @Override

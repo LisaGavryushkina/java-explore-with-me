@@ -37,12 +37,12 @@ public class EventMapper {
                 .map(event -> new EventShortedForResponseDto(event.getId(),
                         event.getAnnotation(),
                         categoryMapper.toCategoryDto(event.getCategory()),
-                        eventIdAndConfirmedRequests.get(event.getId()),
+                        eventIdAndConfirmedRequests.getOrDefault(event.getId(), 0),
                         event.getEventDate(),
                         userMapper.toUserDto(event.getInitiator()),
                         event.isPaid(),
                         event.getTitle(),
-                        eventIdsAndViews.get(event.getId())))
+                        eventIdsAndViews.getOrDefault(event.getId(),0)))
                 .collect(Collectors.toList());
     }
 

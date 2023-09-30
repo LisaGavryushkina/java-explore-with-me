@@ -34,7 +34,7 @@ public class Event {
     private int id;
 
     @Column(name = "annotation", nullable = false)
-    @Size(max = 650)
+    @Size(max = 1000)
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,7 +45,7 @@ public class Event {
     private LocalDateTime createdOn;
 
     @Column(name = "description", nullable = false)
-    @Size(max = 650)
+    @Size(max = 1000)
     private String description;
 
     @Column(name = "event_date", nullable = false)

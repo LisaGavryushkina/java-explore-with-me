@@ -14,6 +14,17 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
             " and r.status = 'CONFIRMED' ")
     List<EventIdWithConfirmedRequests> findAllConfirmedByEventIds(List<Integer> eventIds);
 
+    @Query(nativeQuery = true, value = "" +
+            " select r.event_id as event_id," +
+            " count(r.id) as confirmed_requests" +
+            " where event_id = :eventId " +
+            " and r.status = 'CONFIRMED' ")
+    EventIdWithConfirmedRequests findAllConfirmedByEventId(int eventId);
+
+    List<Request> findAllByRequesterId(int userId);
+
+    boolean existsByRequesterIdAndEventId(int userId, int eventId);
+
     interface EventIdWithConfirmedRequests {
 
         int getEventId();
