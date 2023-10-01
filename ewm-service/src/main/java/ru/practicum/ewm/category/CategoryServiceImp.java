@@ -2,14 +2,19 @@ package ru.practicum.ewm.category;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
+import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
 
 @Service
 @RequiredArgsConstructor
+@Logged
+@Transactional
 public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import ru.practicum.dto.HitForResponseDto;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
 import ru.practicum.ewm.request.RequestDto;
 import ru.practicum.ewm.request.RequestRepository;
@@ -24,6 +27,8 @@ import ru.practicum.ewm.user.UserRepository;
 
 @Service
 @RequiredArgsConstructor
+@Logged
+@Transactional
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;

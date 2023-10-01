@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event;
 
 public enum StateAction {
-    CANCEL_REVIEW
+    CANCEL_REVIEW,
+    PUBLISH_EVENT,
 }

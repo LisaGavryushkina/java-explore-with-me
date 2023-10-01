@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +21,13 @@ public class ErrorHandler {
         log.error(e.getMessage());
         return ResponseEntity.status(e.getStatus())
                 .body(new ErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.error(e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler

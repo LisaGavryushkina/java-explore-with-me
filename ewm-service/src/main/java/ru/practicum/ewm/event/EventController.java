@@ -2,6 +2,7 @@ package ru.practicum.ewm.event;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -55,5 +56,36 @@ public class EventController {
     public UpdatedRequestsStatusDto updateRequestsStatusByInitiator(@PathVariable int userId, @PathVariable int eventId,
                                                                     @RequestBody @Valid ToUpdateRequestsStatusDto toUpdateRequestsStatusDto) {
         return eventService.updateRequestsStatusByInitiator(userId, eventId, toUpdateRequestsStatusDto);
+    }
+
+    @GetMapping("/admin/events")
+    public List<EventForResponseDto> getEventsForAdmin(EventCriteriaForAdmin eventCriteria,
+                                                       @RequestParam(defaultValue = "0") int from,
+                                                       @RequestParam(defaultValue = "10") int size) {
+        return eventService.getEventsForAdmin(eventCriteria, from, size);
+    }
+
+    @PatchMapping("/admin/events/{eventId}")
+    public EventForResponseDto updateEventStateByAdmin(@PathVariable int eventId,
+                                                       @RequestBody EventForRequestDto eventForRequestDto) {
+        return eventService.updateEventStateByAdmin(eventId, eventForRequestDto);
+    }
+
+    @GetMapping("/events")
+    public List<EventShortedForResponseDto> getEventsForPublic(EventCriteriaForPublic eventCriteriaForPublic,
+                                                               @RequestParam(defaultValue = "VIEWS") Sort sort,
+                                                               @RequestParam(defaultValue = "0") int from,
+                                                               @RequestParam(defaultValue = "10") int size,
+                                                               HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String ip = request.getRemoteAddr();
+        return eventService.getEventsForPublic(eventCriteriaForPublic, sort, from, size, uri, ip);
+    }
+
+    @GetMapping("/events/{id}")
+    public EventForResponseDto getEventForPublic(@PathVariable int id, HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String ip = request.getRemoteAddr();
+        return eventService.getEventForPublic(id, uri, ip);
     }
 }

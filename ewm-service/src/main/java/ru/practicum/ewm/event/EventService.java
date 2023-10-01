@@ -18,4 +18,13 @@ public interface EventService {
 
     UpdatedRequestsStatusDto updateRequestsStatusByInitiator(int userId, int eventId,
                                                              ToUpdateRequestsStatusDto toUpdateRequestsStatusDto);
+
+    List<EventForResponseDto> getEventsForAdmin(EventCriteriaForAdmin eventCriteria, int from, int size);
+
+    EventForResponseDto updateEventStateByAdmin(int eventId, EventForRequestDto eventForRequestDto);
+
+    List<EventShortedForResponseDto> getEventsForPublic(EventCriteriaForPublic eventCriteriaForPublic, Sort sort, int from, int size,
+                                                        String uri, String ip);
+
+    EventForResponseDto getEventForPublic(int id, String uri, String ip);
 }

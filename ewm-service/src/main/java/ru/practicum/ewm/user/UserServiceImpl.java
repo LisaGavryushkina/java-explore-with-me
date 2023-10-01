@@ -2,13 +2,18 @@ package ru.practicum.ewm.user;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
 
 @Service
 @RequiredArgsConstructor
+@Logged
+@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
