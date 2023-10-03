@@ -10,7 +10,7 @@ public interface EventService {
 
     EventForResponseDto addEvent(int userId, EventForRequestDto eventForRequestDto);
 
-    EventForResponseDto getEvent(int userId, int eventId);
+    EventForResponseDto getEventByInitiator(int userId, int eventId);
 
     EventForResponseDto updateEventByInitiator(int userId, int eventId, EventForRequestDto eventForRequestDto);
 
@@ -19,11 +19,12 @@ public interface EventService {
     UpdatedRequestsStatusDto updateRequestsStatusByInitiator(int userId, int eventId,
                                                              ToUpdateRequestsStatusDto toUpdateRequestsStatusDto);
 
-    List<EventForResponseDto> getEventsForAdmin(EventCriteriaForAdmin eventCriteria, int from, int size);
+    List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventCriteria, int from, int size);
 
     EventForResponseDto updateEventStateByAdmin(int eventId, EventForRequestDto eventForRequestDto);
 
-    List<EventShortedForResponseDto> getEventsForPublic(EventCriteriaForPublic eventCriteriaForPublic, Sort sort, int from, int size,
+    List<EventShortedForResponseDto> getEventsForPublic(EventFiltersForPublic eventCriteriaForPublic,
+                                                        SortEventsBy sort, int from, int size,
                                                         String uri, String ip);
 
     EventForResponseDto getEventForPublic(int id, String uri, String ip);

@@ -12,8 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 @Data
 public class EventForPublicSpecification implements Specification<Event> {
-    private final EventCriteriaForPublic eventCriteria;
-    private final int confirmedRequests;
+    private final EventFiltersForPublic eventCriteria;
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
@@ -52,10 +51,6 @@ public class EventForPublicSpecification implements Specification<Event> {
                     criteriaBuilder.greaterThan(root.get("event_date"), LocalDateTime.now()));
         }
 
-        if (eventCriteria.isOnlyAvailable()) {
-            predicate = criteriaBuilder.and(predicate,
-                    criteriaBuilder.lessThan(root.get("participants_limit"), confirmedRequests));
-        }
         return predicate;
     }
 }

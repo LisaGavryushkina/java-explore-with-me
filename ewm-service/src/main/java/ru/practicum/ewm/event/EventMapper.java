@@ -32,17 +32,17 @@ public class EventMapper {
 
     public List<EventShortedForResponseDto> toShortedEventDto(List<Event> events,
                                                               Map<Integer, Integer> eventIdsAndViews,
-                                                              Map<Integer, Integer> eventIdAndConfirmedRequests) {
+                                                              Map<Integer, Integer> eventIdsAndConfirmedRequests) {
         return events.stream()
                 .map(event -> new EventShortedForResponseDto(event.getId(),
                         event.getAnnotation(),
                         categoryMapper.toCategoryDto(event.getCategory()),
-                        eventIdAndConfirmedRequests.getOrDefault(event.getId(), 0),
+                        eventIdsAndConfirmedRequests.getOrDefault(event.getId(), 0),
                         event.getEventDate(),
                         userMapper.toUserDto(event.getInitiator()),
                         event.isPaid(),
                         event.getTitle(),
-                        eventIdsAndViews.getOrDefault(event.getId(),0)))
+                        eventIdsAndViews.getOrDefault(event.getId(), 0)))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +65,7 @@ public class EventMapper {
                 eventForRequestDto.getTitle());
     }
 
-    public EventForResponseDto toEventForResponseDto(Event event, int confirmedRequests, int views) {
+    public EventForResponseDto toEventForResponseDto(Event event, int views, int confirmedRequests) {
         return new EventForResponseDto(event.getId(),
                 event.getAnnotation(),
                 categoryMapper.toCategoryDto(event.getCategory()),
@@ -82,5 +82,39 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 views);
+    }
+
+    public Event updateEventByInitiator(Event event, EventForRequestDto eventForRequestDto, Category category) {
+        event.setAnnotation(eventForRequestDto.getAnnotation());
+        if (category != null) {
+            event.setCategory(category);
+        }
+        event.setDescription(eventForRequestDto.getDescription());
+        event.setEventDate(eventForRequestDto.getEventDate());
+        event.setLat(eventForRequestDto.getLocation().getLat());
+        event.setLon(eventForRequestDto.getLocation().getLon());
+        event.setPaid(eventForRequestDto.isPaid());
+        event.setParticipantLimit(eventForRequestDto.getParticipantLimit());
+        event.setRequestModeration(eventForRequestDto.isRequestModeration());
+        event.setTitle(eventForRequestDto.getTitle());
+
+        switch (eventForRequestDto.getStateAction()) {
+            case REJECT_EVENT:
+            case CANCEL_REVIEW:
+                event.setState(State.CANCELED);
+                break;
+            case SEND_TO_REVIEW:
+                event.setState(State.PENDING);
+                break;
+        }
+        return event;
+    }
+
+    public List<EventForResponseDto> toEventForResponseDto(List<Event> events, Map<Integer, Integer> eventIdsAndViews,
+                                                           Map<Integer, Integer> eventIdsAndConfirmedRequests) {
+        return events.stream()
+                .map(event -> toEventForResponseDto(event, eventIdsAndViews.getOrDefault(event.getId(), 0),
+                        eventIdsAndConfirmedRequests.getOrDefault(event.getId(), 0)))
+                .collect(Collectors.toList());
     }
 }

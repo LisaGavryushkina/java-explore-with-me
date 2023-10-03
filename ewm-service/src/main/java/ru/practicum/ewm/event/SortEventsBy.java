@@ -1,6 +1,6 @@
 package ru.practicum.ewm.event;
 
-public enum Sort {
+public enum SortEventsBy {
     EVENT_DATE,
     VIEWS
 }

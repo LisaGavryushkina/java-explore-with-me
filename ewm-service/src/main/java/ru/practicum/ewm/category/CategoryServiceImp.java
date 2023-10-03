@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
@@ -48,7 +49,7 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public List<CategoryDto> getCategories(int from, int size) {
-        return categoryRepository.findAll(new OffsetPageRequest(from, size)).map(categoryMapper::toCategoryDto).getContent();
+        return categoryRepository.findAll(new OffsetPageRequest(from, size, Sort.unsorted())).map(categoryMapper::toCategoryDto).getContent();
     }
 
     @Override

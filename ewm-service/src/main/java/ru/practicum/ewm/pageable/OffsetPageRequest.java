@@ -13,10 +13,14 @@ public class OffsetPageRequest implements Pageable {
     int limit;
     Sort sort;
 
-    public OffsetPageRequest(int offset, int limit) {
+    public OffsetPageRequest(int offset, int limit, Sort sort) {
         this.offset = offset;
         this.limit = limit;
-        this.sort = Sort.unsorted();
+        this.sort = sort;
+    }
+
+    public OffsetPageRequest(int offset, int limit) {
+        this(offset, limit, Sort.unsorted());
     }
 
     @Override

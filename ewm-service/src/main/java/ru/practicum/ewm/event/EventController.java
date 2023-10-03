@@ -37,8 +37,8 @@ public class EventController {
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
-    public EventForResponseDto getEvent(@PathVariable int userId, @PathVariable int eventId) {
-        return eventService.getEvent(userId, eventId);
+    public EventForResponseDto getEventByInitiator(@PathVariable int userId, @PathVariable int eventId) {
+        return eventService.getEventByInitiator(userId, eventId);
     }
 
     @PatchMapping("/users/{userId}/events/{eventId}")
@@ -59,10 +59,10 @@ public class EventController {
     }
 
     @GetMapping("/admin/events")
-    public List<EventForResponseDto> getEventsForAdmin(EventCriteriaForAdmin eventCriteria,
+    public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventFiltersForAdmin,
                                                        @RequestParam(defaultValue = "0") int from,
                                                        @RequestParam(defaultValue = "10") int size) {
-        return eventService.getEventsForAdmin(eventCriteria, from, size);
+        return eventService.getEventsForAdmin(eventFiltersForAdmin, from, size);
     }
 
     @PatchMapping("/admin/events/{eventId}")
@@ -72,14 +72,14 @@ public class EventController {
     }
 
     @GetMapping("/events")
-    public List<EventShortedForResponseDto> getEventsForPublic(EventCriteriaForPublic eventCriteriaForPublic,
-                                                               @RequestParam(defaultValue = "VIEWS") Sort sort,
+    public List<EventShortedForResponseDto> getEventsForPublic(EventFiltersForPublic eventFiltersForPublic,
+                                                               @RequestParam(defaultValue = "VIEWS") SortEventsBy sort,
                                                                @RequestParam(defaultValue = "0") int from,
                                                                @RequestParam(defaultValue = "10") int size,
                                                                HttpServletRequest request) {
         String uri = request.getRequestURI();
         String ip = request.getRemoteAddr();
-        return eventService.getEventsForPublic(eventCriteriaForPublic, sort, from, size, uri, ip);
+        return eventService.getEventsForPublic(eventFiltersForPublic, sort, from, size, uri, ip);
     }
 
     @GetMapping("/events/{id}")

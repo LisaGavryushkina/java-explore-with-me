@@ -12,13 +12,11 @@ import lombok.ToString;
 @ToString
 @Getter
 @AllArgsConstructor
-public class EventCriteriaForPublic {
+public class EventFiltersForAdmin {
 
-    private String text;
+    private List<Integer> users;
+    private List<State> states;
     private List<Integer> categories;
-    private boolean paid;
     private LocalDateTime rangeStart;
     private LocalDateTime rangeEnd;
-    private boolean onlyAvailable;
-
 }

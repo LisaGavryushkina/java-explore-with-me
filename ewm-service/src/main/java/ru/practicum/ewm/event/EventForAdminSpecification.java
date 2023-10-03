@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 @Data
 public class EventForAdminSpecification implements Specification<Event> {
-    private final EventCriteriaForAdmin eventCriteria;
+    private final EventFiltersForAdmin eventCriteria;
 
     @Override
     public Predicate toPredicate(Root<Event> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {

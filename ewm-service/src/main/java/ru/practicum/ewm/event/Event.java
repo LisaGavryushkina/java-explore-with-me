@@ -18,7 +18,9 @@ import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Formula;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.user.User;
 
@@ -35,10 +37,12 @@ public class Event {
 
     @Column(name = "annotation", nullable = false)
     @Size(max = 1000)
+    @Setter
     private String annotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
+    @Setter
     private Category category;
 
     @Column(name = "created", nullable = false)
@@ -46,9 +50,11 @@ public class Event {
 
     @Column(name = "description", nullable = false)
     @Size(max = 1000)
+    @Setter
     private String description;
 
     @Column(name = "event_date", nullable = false)
+    @Setter
     private LocalDateTime eventDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,28 +62,40 @@ public class Event {
     private User initiator;
 
     @Column(name = "latitude", nullable = false)
+    @Setter
     private long lat;
 
     @Column(name = "longitude", nullable = false)
+    @Setter
     private long lon;
 
     @Column(name = "is_paid", nullable = false)
+    @Setter
     private boolean paid;
 
     @Column(name = "participant_limit", nullable = false)
+    @Setter
     private int participantLimit;
+
+    @Formula("(participant_limit = 0 " +
+            "or (select count(*) where requests.event_id = events.id " +
+            "and requests.status = 'CONFIRMED'))")
+    private boolean isAvailable;
 
     @Column(name = "published")
     private LocalDateTime publishedOn;
 
     @Column(name = "request_moderation", nullable = false)
+    @Setter
     private boolean requestModeration;
 
     @Enumerated(EnumType.STRING)
     @JoinColumn(name = "state", nullable = false)
+    @Setter
     private State state;
 
     @Column(name = "title", nullable = false)
+    @Setter
     private String title;
 
     @Override

@@ -1,9 +1,12 @@
 package ru.practicum.ewm.request;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.event.Event;
+import ru.practicum.ewm.event.UpdatedRequestsStatusDto;
 import ru.practicum.ewm.user.User;
 
 @Component
@@ -23,5 +26,15 @@ public class RequestMapper {
                 event,
                 requester,
                 status);
+    }
+
+    public UpdatedRequestsStatusDto toUpdatedRequestsStatusDto(List<Request> confirmedRequests,
+                                                               List<Request> canceledRequests) {
+        return new UpdatedRequestsStatusDto(confirmedRequests.stream()
+                .map(this::toRequestDto)
+                .collect(Collectors.toList()),
+                canceledRequests.stream()
+                        .map(this::toRequestDto)
+                        .collect(Collectors.toList()));
     }
 }
