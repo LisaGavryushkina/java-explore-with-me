@@ -1,4 +1,4 @@
-package ru.practicum.ewm.request;
+package ru.practicum.ewm.request.exception;
 
 import ru.practicum.ewm.error_handler.ExploreWithMeNotFoundException;
 

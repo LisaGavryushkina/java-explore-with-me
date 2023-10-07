@@ -1,14 +1,11 @@
 package ru.practicum.client;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.message.BasicNameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,15 +19,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.practicum.dto.HitForRequestDto;
 import ru.practicum.dto.HitForResponseDto;
-
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class StatsClient {
 
-    private static final String STATS_SERVER_URL = "http://stats-server:9090";
+    private static final String STATS_SERVER_URL = "http://stats-server:8080";
+    private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     private final RestTemplate rest;
 
     @Autowired
@@ -45,30 +44,19 @@ public class StatsClient {
         return post("/hit", hitForRequestDto);
     }
 
-    public List<HitForResponseDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris,
-                                                 boolean unique) {
+    public List<HitForResponseDto> getStatistics(LocalDateTime start, LocalDateTime end,
+                                                 Collection<String> uris, boolean unique) {
 
-        Map<String, Object> parameters = Map.of(
-                "start", start,
-                "end", end,
-                "uris", uris,
-                "unique", unique
-        );
-        try {
-            URIBuilder uriBuilder = new URIBuilder("http://stats-server/stats");
-            uriBuilder.setPort(9090);
-            uriBuilder.addParameters(parameters.entrySet()
-                    .stream()
-                    .filter(entry -> entry.getKey() != null)
-                    .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue().toString()))
-                    .collect(toList()));
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString("http://stats-server/stats")
+                .port(8080)
+                .queryParam("start", start.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                .queryParam("end", end.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                .queryParam("uris", uris)
+                .queryParam("unique", unique)
+                .build();
 
-            URL url = uriBuilder.build().toURL();
-            return get(url.getPath(), parameters);
-        } catch (URISyntaxException | MalformedURLException e) {
-            throw new StatsClientException("Не удалось загрузить статистику");
-        }
-//        return get("/stats?start={start}&end={end}&uris={uris}&unique={unique}", parameters);
+        return get(uriComponents.toUri());
+
     }
 
     private HitForResponseDto post(String path, HitForRequestDto body) {
@@ -79,23 +67,25 @@ public class StatsClient {
             statsServerResponse = rest.exchange(path, HttpMethod.POST, requestEntity, HitForResponseDto.class);
 
         } catch (HttpStatusCodeException e) {
-            throw new StatsClientException("Не удалось добавить данные для статистики");
+            e.printStackTrace();
+            throw new StatsClientException("Не удалось добавить данные для статистики", e);
         }
         return statsServerResponse.getBody();
 
     }
 
-    private List<HitForResponseDto> get(String path, Map<String, Object> parameters) {
+    private List<HitForResponseDto> get(URI uri) {
         HttpEntity<Object> requestEntity = new HttpEntity<>(null, defaultHeaders());
 
         ResponseEntity<List<HitForResponseDto>> statsServerResponse;
         try {
-            statsServerResponse = rest.exchange(path, HttpMethod.GET, requestEntity,
+            statsServerResponse = rest.exchange(uri, HttpMethod.GET, requestEntity,
                     new ParameterizedTypeReference<>() {
-                    }, parameters);
+                    });
 
         } catch (HttpStatusCodeException e) {
-            throw new StatsClientException("Не удалось загрузить статистику");
+            e.printStackTrace();
+            throw new StatsClientException("Не удалось загрузить статистику", e);
         }
         return statsServerResponse.getBody();
 

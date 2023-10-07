@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -11,10 +11,10 @@ import javax.validation.Payload;
 
 
 @Documented
-@Constraint(validatedBy = EventDateValidator.class)
+@Constraint(validatedBy = AddEventDateValidator.class)
 @Target( { ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EventDateConstraint {
+public @interface AddEventDateConstraint {
     String message() default "Дата и время события не могут быть раньше, чем через 2 часа от текущего момента";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

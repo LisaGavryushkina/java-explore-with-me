@@ -1,6 +1,7 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.exception;
 
 import ru.practicum.ewm.error_handler.ExploreWithMeConflictException;
+import ru.practicum.ewm.event.State;
 
 public class EventWithNotPendingStateCantBePublished extends ExploreWithMeConflictException {
 

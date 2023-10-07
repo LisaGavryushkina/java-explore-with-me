@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.event.dto.EventFiltersForAdmin;
+import ru.practicum.ewm.event.dto.EventFiltersForPublic;
+import ru.practicum.ewm.event.dto.EventForResponseDto;
+import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
+import ru.practicum.ewm.event.dto.EventToAddDto;
+import ru.practicum.ewm.event.dto.UpdateEventDto;
+import ru.practicum.ewm.event.dto.UpdateRequestsStatusDto;
+import ru.practicum.ewm.event.dto.UpdatedRequestsStatusDto;
 import ru.practicum.ewm.request.RequestDto;
 
 @RestController
@@ -32,8 +40,8 @@ public class EventController {
     @PostMapping("/users/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventForResponseDto addEvent(@PathVariable int userId,
-                                        @RequestBody @Valid EventForRequestDto eventForRequestDto) {
-        return eventService.addEvent(userId, eventForRequestDto);
+                                        @RequestBody @Valid EventToAddDto eventToAddDto) {
+        return eventService.addEvent(userId, eventToAddDto);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")
@@ -43,8 +51,8 @@ public class EventController {
 
     @PatchMapping("/users/{userId}/events/{eventId}")
     public EventForResponseDto updateEventByInitiator(@PathVariable int userId, @PathVariable int eventId,
-                                                      @RequestBody EventForRequestDto eventForRequestDto) {
-        return eventService.updateEventByInitiator(userId, eventId, eventForRequestDto);
+                                                      @RequestBody @Valid UpdateEventDto updateEventDto) {
+        return eventService.updateEventByInitiator(userId, eventId, updateEventDto);
     }
 
     @GetMapping("/users/{userId}/events/{eventId}/requests")
@@ -54,25 +62,25 @@ public class EventController {
 
     @PatchMapping("/users/{userId}/events/{eventId}/requests")
     public UpdatedRequestsStatusDto updateRequestsStatusByInitiator(@PathVariable int userId, @PathVariable int eventId,
-                                                                    @RequestBody @Valid ToUpdateRequestsStatusDto toUpdateRequestsStatusDto) {
-        return eventService.updateRequestsStatusByInitiator(userId, eventId, toUpdateRequestsStatusDto);
+                                                                    @RequestBody UpdateRequestsStatusDto updateRequestsStatusDto) {
+        return eventService.updateRequestsStatusByInitiator(userId, eventId, updateRequestsStatusDto);
     }
 
     @GetMapping("/admin/events")
-    public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventFiltersForAdmin,
+    public List<EventForResponseDto> getEventsForAdmin(@Valid EventFiltersForAdmin eventFiltersForAdmin,
                                                        @RequestParam(defaultValue = "0") int from,
                                                        @RequestParam(defaultValue = "10") int size) {
         return eventService.getEventsForAdmin(eventFiltersForAdmin, from, size);
     }
 
     @PatchMapping("/admin/events/{eventId}")
-    public EventForResponseDto updateEventStateByAdmin(@PathVariable int eventId,
-                                                       @RequestBody EventForRequestDto eventForRequestDto) {
-        return eventService.updateEventStateByAdmin(eventId, eventForRequestDto);
+    public EventForResponseDto updateEventByAdmin(@PathVariable int eventId,
+                                                  @RequestBody @Valid UpdateEventDto updateEventDto) {
+        return eventService.updateEventByAdmin(eventId, updateEventDto);
     }
 
     @GetMapping("/events")
-    public List<EventShortedForResponseDto> getEventsForPublic(EventFiltersForPublic eventFiltersForPublic,
+    public List<EventShortedForResponseDto> getEventsForPublic(@Valid EventFiltersForPublic eventFiltersForPublic,
                                                                @RequestParam(defaultValue = "VIEWS") SortEventsBy sort,
                                                                @RequestParam(defaultValue = "0") int from,
                                                                @RequestParam(defaultValue = "10") int size,

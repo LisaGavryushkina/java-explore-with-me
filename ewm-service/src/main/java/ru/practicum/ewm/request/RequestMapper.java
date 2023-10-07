@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.event.UpdatedRequestsStatusDto;
+import ru.practicum.ewm.event.dto.UpdatedRequestsStatusDto;
 import ru.practicum.ewm.user.User;
 
 @Component
@@ -29,11 +29,11 @@ public class RequestMapper {
     }
 
     public UpdatedRequestsStatusDto toUpdatedRequestsStatusDto(List<Request> confirmedRequests,
-                                                               List<Request> canceledRequests) {
+                                                               List<Request> rejectedRequests) {
         return new UpdatedRequestsStatusDto(confirmedRequests.stream()
                 .map(this::toRequestDto)
                 .collect(Collectors.toList()),
-                canceledRequests.stream()
+                rejectedRequests.stream()
                         .map(this::toRequestDto)
                         .collect(Collectors.toList()));
     }

@@ -9,15 +9,18 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
-import ru.practicum.ewm.event.EventNotFoundException;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.State;
+import ru.practicum.ewm.event.exception.EventNotFoundException;
 import ru.practicum.ewm.log.Logged;
+import ru.practicum.ewm.request.exception.EventNotPublishedException;
+import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
+import ru.practicum.ewm.request.exception.RepeatedRequestException;
+import ru.practicum.ewm.request.exception.RequestFromInitiatorException;
+import ru.practicum.ewm.request.exception.RequestNotFoundException;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
-
-import static ru.practicum.ewm.request.RequestRepository.EventIdWithConfirmedRequests;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +55,7 @@ public class RequestServiceImpl implements RequestService {
         if (event.getState() != State.PUBLISHED) {
             throw new EventNotPublishedException(eventId);
         }
-        EventIdWithConfirmedRequests confirmedRequests = requestRepository.findAllConfirmedByEventId(eventId);
-        if (confirmedRequests.getConfirmedRequests() == event.getParticipantLimit() &&
+        if (event.getConfirmedRequests() == event.getParticipantLimit() &&
                 event.getParticipantLimit() != 0) {
             throw new ParticipantLimitExceededException(eventId);
         }

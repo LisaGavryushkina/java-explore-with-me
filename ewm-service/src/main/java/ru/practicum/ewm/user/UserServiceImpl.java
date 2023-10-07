@@ -6,7 +6,6 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
@@ -24,9 +23,9 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
         Page<User> users;
         if (ids == null) {
-            users = userRepository.findAll(new OffsetPageRequest(from, size, Sort.unsorted()));
+            users = userRepository.findAll(new OffsetPageRequest(from, size));
         } else {
-            users = userRepository.findAllByIdIn(ids, new OffsetPageRequest(from, size, Sort.unsorted()));
+            users = userRepository.findAllByIdIn(ids, new OffsetPageRequest(from, size));
         }
         return users.map(userMapper::toUserDtoForAdmin).getContent();
     }

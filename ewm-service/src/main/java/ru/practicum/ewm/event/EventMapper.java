@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryMapper;
+import ru.practicum.ewm.event.dto.EventForResponseDto;
+import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
+import ru.practicum.ewm.event.dto.EventToAddDto;
+import ru.practicum.ewm.event.dto.UpdateEventDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserMapper;
 
@@ -18,26 +22,13 @@ public class EventMapper {
     private final CategoryMapper categoryMapper;
     private final UserMapper userMapper;
 
-    public EventShortedForResponseDto toShortedEventDto(Event event, int confirmedRequests, int views) {
-        return new EventShortedForResponseDto(event.getId(),
-                event.getAnnotation(),
-                categoryMapper.toCategoryDto(event.getCategory()),
-                confirmedRequests,
-                event.getEventDate(),
-                userMapper.toUserDto(event.getInitiator()),
-                event.isPaid(),
-                event.getTitle(),
-                views);
-    }
-
     public List<EventShortedForResponseDto> toShortedEventDto(List<Event> events,
-                                                              Map<Integer, Integer> eventIdsAndViews,
-                                                              Map<Integer, Integer> eventIdsAndConfirmedRequests) {
+                                                              Map<Integer, Integer> eventIdsAndViews) {
         return events.stream()
                 .map(event -> new EventShortedForResponseDto(event.getId(),
                         event.getAnnotation(),
                         categoryMapper.toCategoryDto(event.getCategory()),
-                        eventIdsAndConfirmedRequests.getOrDefault(event.getId(), 0),
+                        event.getConfirmedRequests(),
                         event.getEventDate(),
                         userMapper.toUserDto(event.getInitiator()),
                         event.isPaid(),
@@ -46,7 +37,19 @@ public class EventMapper {
                 .collect(Collectors.toList());
     }
 
-    public Event toEvent(EventForRequestDto eventForRequestDto, Category category, User user, LocalDateTime now,
+    public EventShortedForResponseDto toShortedEventDto(Event event, int views) {
+        return new EventShortedForResponseDto(event.getId(),
+                event.getAnnotation(),
+                categoryMapper.toCategoryDto(event.getCategory()),
+                event.getConfirmedRequests(),
+                event.getEventDate(),
+                userMapper.toUserDto(event.getInitiator()),
+                event.isPaid(),
+                event.getTitle(),
+                views);
+    }
+
+    public Event toEvent(EventToAddDto eventForRequestDto, Category category, User user, LocalDateTime now,
                          State state) {
         return new Event(0,
                 eventForRequestDto.getAnnotation(),
@@ -59,17 +62,18 @@ public class EventMapper {
                 eventForRequestDto.getLocation().getLon(),
                 eventForRequestDto.isPaid(),
                 eventForRequestDto.getParticipantLimit(),
+                0,
                 null,
                 eventForRequestDto.isRequestModeration(),
                 state,
                 eventForRequestDto.getTitle());
     }
 
-    public EventForResponseDto toEventForResponseDto(Event event, int views, int confirmedRequests) {
+    public EventForResponseDto toEventForResponseDto(Event event, int views) {
         return new EventForResponseDto(event.getId(),
                 event.getAnnotation(),
                 categoryMapper.toCategoryDto(event.getCategory()),
-                confirmedRequests,
+                event.getConfirmedRequests(),
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getEventDate(),
@@ -84,37 +88,46 @@ public class EventMapper {
                 views);
     }
 
-    public Event updateEventByInitiator(Event event, EventForRequestDto eventForRequestDto, Category category) {
-        event.setAnnotation(eventForRequestDto.getAnnotation());
-        if (category != null) {
-            event.setCategory(category);
-        }
-        event.setDescription(eventForRequestDto.getDescription());
-        event.setEventDate(eventForRequestDto.getEventDate());
-        event.setLat(eventForRequestDto.getLocation().getLat());
-        event.setLon(eventForRequestDto.getLocation().getLon());
-        event.setPaid(eventForRequestDto.isPaid());
-        event.setParticipantLimit(eventForRequestDto.getParticipantLimit());
-        event.setRequestModeration(eventForRequestDto.isRequestModeration());
-        event.setTitle(eventForRequestDto.getTitle());
-
-        switch (eventForRequestDto.getStateAction()) {
-            case REJECT_EVENT:
-            case CANCEL_REVIEW:
-                event.setState(State.CANCELED);
-                break;
-            case SEND_TO_REVIEW:
-                event.setState(State.PENDING);
-                break;
-        }
-        return event;
+    public List<EventForResponseDto> toEventForResponseDto(List<Event> events, Map<Integer, Integer> eventIdsAndViews) {
+        return events.stream()
+                .map(event -> toEventForResponseDto(event, eventIdsAndViews.getOrDefault(event.getId(), 0)))
+                .collect(Collectors.toList());
     }
 
-    public List<EventForResponseDto> toEventForResponseDto(List<Event> events, Map<Integer, Integer> eventIdsAndViews,
-                                                           Map<Integer, Integer> eventIdsAndConfirmedRequests) {
-        return events.stream()
-                .map(event -> toEventForResponseDto(event, eventIdsAndViews.getOrDefault(event.getId(), 0),
-                        eventIdsAndConfirmedRequests.getOrDefault(event.getId(), 0)))
-                .collect(Collectors.toList());
+    public Event updateEvent(Event event, UpdateEventDto updateEventDto,
+                             Category category, State state) {
+        String annotation = updateEventDto.getAnnotation();
+        String description = updateEventDto.getDescription();
+        LocalDateTime eventDate = updateEventDto.getEventDate();
+        Location location = updateEventDto.getLocation();
+        int participantLimit = updateEventDto.getParticipantLimit();
+        String title = updateEventDto.getTitle();
+        Boolean paid = updateEventDto.getPaid();
+
+        if (annotation != null) {
+            event.setAnnotation(annotation);
+        }
+        event.setCategory(category);
+        if (description != null) {
+            event.setDescription(description);
+        }
+        if(eventDate != null) {
+            event.setEventDate(eventDate);
+        }
+        if(location != null) {
+            event.setLat(location.getLat());
+            event.setLon(location.getLon());
+        }
+        if(paid != null) {
+            event.setPaid(paid);
+        }
+        if(participantLimit != 0) {
+            event.setParticipantLimit(participantLimit);
+        }
+        if(title != null) {
+            event.setTitle(title);
+        }
+        event.setState(state);
+        return event;
     }
 }

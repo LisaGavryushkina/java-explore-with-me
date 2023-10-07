@@ -1,15 +1,15 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.validation;
 
 import java.time.LocalDateTime;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class EventDateValidator implements
-        ConstraintValidator<EventDateConstraint, LocalDateTime> {
+public class AddEventDateValidator implements
+        ConstraintValidator<AddEventDateConstraint, LocalDateTime> {
 
     @Override
-    public void initialize(EventDateConstraint eventDateConstraint) {
+    public void initialize(AddEventDateConstraint eventDateConstraint) {
     }
 
     @Override

@@ -36,7 +36,7 @@ public class Event {
     private int id;
 
     @Column(name = "annotation", nullable = false)
-    @Size(max = 1000)
+    @Size(max = 2000)
     @Setter
     private String annotation;
 
@@ -49,7 +49,7 @@ public class Event {
     private LocalDateTime createdOn;
 
     @Column(name = "description", nullable = false)
-    @Size(max = 1000)
+    @Size(max = 7000)
     @Setter
     private String description;
 
@@ -63,11 +63,11 @@ public class Event {
 
     @Column(name = "latitude", nullable = false)
     @Setter
-    private long lat;
+    private float lat;
 
     @Column(name = "longitude", nullable = false)
     @Setter
-    private long lon;
+    private float lon;
 
     @Column(name = "is_paid", nullable = false)
     @Setter
@@ -77,10 +77,8 @@ public class Event {
     @Setter
     private int participantLimit;
 
-    @Formula("(participant_limit = 0 " +
-            "or (select count(*) where requests.event_id = events.id " +
-            "and requests.status = 'CONFIRMED'))")
-    private boolean isAvailable;
+    @Formula("(select count(*) from requests as r where r.event_id = id and r.status = 'CONFIRMED')")
+    private int confirmedRequests;
 
     @Column(name = "published")
     private LocalDateTime publishedOn;
@@ -96,6 +94,7 @@ public class Event {
 
     @Column(name = "title", nullable = false)
     @Setter
+    @Size(max = 120)
     private String title;
 
     @Override

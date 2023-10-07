@@ -7,26 +7,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatsClient;
+import ru.practicum.dto.HitForRequestDto;
 import ru.practicum.dto.HitForResponseDto;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.event.dto.EventFiltersForAdmin;
+import ru.practicum.ewm.event.dto.EventFiltersForPublic;
+import ru.practicum.ewm.event.dto.EventForResponseDto;
+import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
+import ru.practicum.ewm.event.dto.EventToAddDto;
+import ru.practicum.ewm.event.dto.UpdateEventDto;
+import ru.practicum.ewm.event.dto.UpdateRequestsStatusDto;
+import ru.practicum.ewm.event.dto.UpdatedRequestsStatusDto;
+import ru.practicum.ewm.event.exception.EventDateAlreadyPassedException;
+import ru.practicum.ewm.event.exception.EventDateInLessThanAnHourException;
+import ru.practicum.ewm.event.exception.EventNotFoundException;
+import ru.practicum.ewm.event.exception.EventWithNotPendingStateCantBePublished;
+import ru.practicum.ewm.event.exception.NotPendingRequestStatusCantBeUpdated;
+import ru.practicum.ewm.event.exception.PublishedEventCantBeUpdatedException;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
-import ru.practicum.ewm.request.ParticipantLimitExceededException;
 import ru.practicum.ewm.request.Request;
 import ru.practicum.ewm.request.RequestDto;
 import ru.practicum.ewm.request.RequestMapper;
 import ru.practicum.ewm.request.RequestRepository;
-import ru.practicum.ewm.request.RequestRepository.EventIdWithConfirmedRequests;
 import ru.practicum.ewm.request.Status;
+import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
@@ -44,53 +56,66 @@ public class EventServiceImpl implements EventService {
     private final RequestMapper requestMapper;
     private final CategoryRepository categoryRepository;
     private final StatsClient statsClient;
+    public static final String APP = "ewm-service";
 
     @Override
     public List<EventShortedForResponseDto> getInitiatorEvents(int userId, int from, int size) {
-        Page<Event> events = eventRepository.findAllByInitiatorId(userId, new OffsetPageRequest(from, size,
-                org.springframework.data.domain.Sort.unsorted()));
-        Map<String, Map<Integer, Integer>> viewsAndConfirmedRequests =
-                getViewsAndConfirmedRequests(events.getContent());
-        return eventMapper.toShortedEventDto(events.getContent(), viewsAndConfirmedRequests.get("eventIdsAndViews"),
-                viewsAndConfirmedRequests.get("eventIdsAndConfirmedRequests"));
+        Page<Event> events = eventRepository.findAllByInitiatorId(userId, new OffsetPageRequest(from, size));
+        Map<Integer, Integer> viewsByEventIds = getViews(events.getContent());
+        return eventMapper.toShortedEventDto(events.getContent(), viewsByEventIds);
     }
 
     @Override
-    public EventForResponseDto addEvent(int userId, EventForRequestDto eventForRequestDto) {
+    public EventForResponseDto addEvent(int userId, EventToAddDto eventToAddDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Category category =
-                categoryRepository.findById(eventForRequestDto.getCategory()).orElseThrow(() -> new CategoryNotFoundException(eventForRequestDto.getCategory()));
-        Event event = eventRepository.save(eventMapper.toEvent(eventForRequestDto, category, user,
-                LocalDateTime.now(), State.WAITING));
-        return eventMapper.toEventForResponseDto(event, 0, 0);
+                categoryRepository.findById(eventToAddDto.getCategory()).orElseThrow(() -> new CategoryNotFoundException(eventToAddDto.getCategory()));
+        Event event = eventRepository.save(eventMapper.toEvent(eventToAddDto, category, user,
+                LocalDateTime.now(), State.PENDING));
+        return eventMapper.toEventForResponseDto(event, 0);
     }
 
     @Override
     public EventForResponseDto getEventByInitiator(int userId, int eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
-        Map<String, Integer> viewsAndConfirmedRequests = getViewsAndConfirmedRequests(eventId);
-        return eventMapper.toEventForResponseDto(event,
-                viewsAndConfirmedRequests.get("views"), viewsAndConfirmedRequests.get("confirmedRequests"));
+        int views = getViews(eventId);
+        return eventMapper.toEventForResponseDto(event, views);
+    }
+
+    private State determineStateForInitiator(StateAction stateAction) {
+        switch (stateAction) {
+            case REJECT_EVENT:
+            case CANCEL_REVIEW:
+                return State.CANCELED;
+            case SEND_TO_REVIEW:
+                return State.PENDING;
+            default:
+                throw new IllegalStateException("Unexpected value: " + stateAction);
+        }
     }
 
     @Override
-    public EventForResponseDto updateEventByInitiator(int userId, int eventId, EventForRequestDto eventForRequestDto) {
+    public EventForResponseDto updateEventByInitiator(int userId, int eventId, UpdateEventDto updateEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         if (event.getState() == State.PUBLISHED) {
             throw new PublishedEventCantBeUpdatedException(eventId);
         }
-        int categoryId = eventForRequestDto.getCategory();
-        Category category = null;
-        if (categoryId != event.getCategory().getId()) {
-            category =
-                    categoryRepository.findById(categoryId).orElseThrow(() -> new CategoryNotFoundException(categoryId));
+        State state = event.getState();
+        StateAction stateAction = updateEventDto.getStateAction();
+        if (stateAction != null) {
+            state = determineStateForInitiator(stateAction);
         }
-        Event toUpdate = eventMapper.updateEventByInitiator(event, eventForRequestDto, category);
-        Map<String, Integer> viewsAndConfirmedRequests = getViewsAndConfirmedRequests(eventId);
-        return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate),
-                viewsAndConfirmedRequests.get("views"), viewsAndConfirmedRequests.get("confirmedRequests"));
+        int newCategoryId = updateEventDto.getCategory();
+        Category category = event.getCategory();
+        if (newCategoryId != category.getId() && newCategoryId != 0) {
+            category =
+                    categoryRepository.findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
+        }
+        Event toUpdate = eventMapper.updateEvent(event, updateEventDto, category, state);
+        int views = getViews(eventId);
+        return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate), views);
     }
 
     @Override
@@ -105,151 +130,155 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public UpdatedRequestsStatusDto updateRequestsStatusByInitiator(int userId, int eventId,
-                                                                    ToUpdateRequestsStatusDto toUpdateRequestsStatusDto) {
+                                                                    UpdateRequestsStatusDto updateRequestsStatusDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
-        EventIdWithConfirmedRequests withConfirmedRequests = requestRepository.findAllConfirmedByEventId(eventId);
         int limit = event.getParticipantLimit();
-        if (limit != 0 && limit == withConfirmedRequests.getConfirmedRequests()) {
+        if (limit != 0 && limit == event.getConfirmedRequests()) {
             throw new ParticipantLimitExceededException(eventId);
         }
-        List<Request> requests = requestRepository.findAllById(toUpdateRequestsStatusDto.getRequestsIds());
+        List<Integer> requestsIds = updateRequestsStatusDto.getRequestsIds();
+        List<Request> requests;
+        if (requestsIds != null && !requestsIds.isEmpty()) {
+            requests = requestRepository.findAllById(requestsIds);
+        } else {
+            requests = requestRepository.findAllByEventId(eventId);
+        }
         boolean statusIsPending = requests.stream()
                 .allMatch(request -> request.getStatus() == Status.PENDING);
         if (!statusIsPending) {
             throw new NotPendingRequestStatusCantBeUpdated();
         }
-        int amountOfConfirmedRequests = withConfirmedRequests.getConfirmedRequests();
-        int i = 0;
+        Status newStatus = updateRequestsStatusDto.getStatus();
         List<Request> confirmedRequests = new ArrayList<>();
-        while (amountOfConfirmedRequests < limit && i < requests.size()) {
-            Request request = requests.get(i);
-            request.setStatus(toUpdateRequestsStatusDto.getStatus());
-            requestRepository.save(request);
-            confirmedRequests.add(request);
-            i++;
-            amountOfConfirmedRequests++;
-        }
-        List<Request> pendingRequestsToCancel = new ArrayList<>();
-        if (amountOfConfirmedRequests == limit) {
-            pendingRequestsToCancel = requestRepository.findAllByEventIdAndStatus(eventId, Status.PENDING);
-            if (!pendingRequestsToCancel.isEmpty()) {
-                pendingRequestsToCancel.forEach(request -> request.setStatus(Status.CANCELED));
-                pendingRequestsToCancel.forEach(requestRepository::save);
+        List<Request> rejectedRequests = new ArrayList<>();
+        if (newStatus == Status.CONFIRMED) {
+            int amountOfConfirmedRequests = event.getConfirmedRequests();
+            int i = 0;
+            while (amountOfConfirmedRequests < limit && i < requests.size()) {
+                Request request = requests.get(i);
+                request.setStatus(newStatus);
+                requestRepository.save(request);
+                confirmedRequests.add(request);
+                i++;
+                amountOfConfirmedRequests++;
+            }
+            List<Request> pendingRequestsToCancel = new ArrayList<>();
+            if (amountOfConfirmedRequests == limit) {
+                pendingRequestsToCancel = requestRepository.findAllByEventIdAndStatus(eventId, Status.PENDING);
+                if (!pendingRequestsToCancel.isEmpty()) {
+                    pendingRequestsToCancel.forEach(request -> request.setStatus(Status.CANCELED));
+                    pendingRequestsToCancel.forEach(requestRepository::save);
+                    rejectedRequests.addAll(pendingRequestsToCancel);
+                }
             }
         }
-        return requestMapper.toUpdatedRequestsStatusDto(confirmedRequests, pendingRequestsToCancel);
+        if(newStatus == Status.REJECTED) {
+            requests.forEach(request -> request.setStatus(Status.REJECTED));
+            rejectedRequests.addAll(requests);
+        }
+        return requestMapper.toUpdatedRequestsStatusDto(confirmedRequests, rejectedRequests);
     }
 
     @Override
-    public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventCriteria, int from, int size) {
-        EventForAdminSpecification specification = new EventForAdminSpecification(eventCriteria);
+    public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventFiltersForAdmin, int from, int size) {
+        EventForAdminSpecification specification = new EventForAdminSpecification(eventFiltersForAdmin);
         Page<Event> events = eventRepository.findAll(specification, new OffsetPageRequest(from, size));
-        Map<String, Map<Integer, Integer>> viewsAndConfirmedRequests =
-                getViewsAndConfirmedRequests(events.getContent());
-        return eventMapper.toEventForResponseDto(events.getContent(), viewsAndConfirmedRequests.get("eventIdsAndViews"),
-                viewsAndConfirmedRequests.get("eventIdsAndConfirmedRequests"));
+        Map<Integer, Integer> viewsByEventIds = getViews(events.getContent());
+        return eventMapper.toEventForResponseDto(events.getContent(), viewsByEventIds);
     }
 
     @Override
-    public EventForResponseDto updateEventStateByAdmin(int eventId, EventForRequestDto eventForRequestDto) {
+    public EventForResponseDto updateEventByAdmin(int eventId, UpdateEventDto updateEventDto) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
-        State state;
-        switch (eventForRequestDto.getStateAction()) {
+        LocalDateTime newEventDate = updateEventDto.getEventDate();
+        if (newEventDate != null) {
+            if (newEventDate.isBefore(LocalDateTime.now())) {
+                throw new EventDateAlreadyPassedException(eventId, newEventDate);
+            }
+        }
+        StateAction stateAction = updateEventDto.getStateAction();
+        State state = event.getState();
+        if (stateAction != null) {
+            state = determineStateForAdmin(stateAction, event);
+        }
+        int newCategoryId = updateEventDto.getCategory();
+        Category category = event.getCategory();
+        if (newCategoryId != category.getId() && newCategoryId != 0) {
+            category = categoryRepository
+                    .findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
+        }
+        Event updated = eventMapper.updateEvent(event, updateEventDto, category, state);
+        int views = getViews(eventId);
+        return eventMapper.toEventForResponseDto(eventRepository.save(updated), views);
+    }
+
+    private State determineStateForAdmin(StateAction stateAction, Event event) {
+        switch (stateAction) {
             case PUBLISH_EVENT:
                 if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-                    throw new EventDateInLessThanAnHourException(eventId);
+                    throw new EventDateInLessThanAnHourException(event.getId());
                 }
-                if (event.getState() != State.PENDING) {
-                    throw new EventWithNotPendingStateCantBePublished(eventId, event.getState());
+                //?????
+                if (event.getState() != State.PENDING && event.getState() != State.WAITING) {
+                    throw new EventWithNotPendingStateCantBePublished(event.getId(), event.getState());
                 }
-                state = State.PUBLISHED;
-                break;
-
+                return State.PUBLISHED;
             case REJECT_EVENT:
                 if (event.getState() == State.PUBLISHED) {
-                    throw new PublishedEventCantBeUpdatedException(eventId);
+                    throw new PublishedEventCantBeUpdatedException(event.getId());
                 }
-                state = State.CANCELED;
-                break;
-
+                return State.CANCELED;
             default:
-                throw new IllegalStateException("Unexpected value: " + eventForRequestDto.getStateAction());
+                throw new IllegalStateException("Unexpected value: " + stateAction);
         }
-        event.setState(state);
-        Map<String, Integer> viewsAndConfirmedRequests = getViewsAndConfirmedRequests(eventId);
-        return eventMapper.toEventForResponseDto(eventRepository.save(event),
-                viewsAndConfirmedRequests.get("views"), viewsAndConfirmedRequests.get("confirmedRequests"));
     }
 
     @Override
     public List<EventShortedForResponseDto> getEventsForPublic(
-            EventFiltersForPublic eventCriteriaForPublic, SortEventsBy sort, int from, int size,
+            EventFiltersForPublic eventFiltersForPublic, SortEventsBy sort, int from, int size,
             String uri, String ip) {
-        EventForPublicSpecification specification = new EventForPublicSpecification(eventCriteriaForPublic);
-        List<EventShortedForResponseDto> responseDtos;
-        switch (sort) {
-            case EVENT_DATE: {
-                Page<Event> events = eventRepository.findAll(specification, new OffsetPageRequest(from, size,
-                        Sort.by("event_date")));
 
-                Map<String, Map<Integer, Integer>> viewsAndConfirmedRequests =
-                        getViewsAndConfirmedRequests(events.getContent());
-                responseDtos = eventMapper.toShortedEventDto(events.getContent(), viewsAndConfirmedRequests.get(
-                                "eventIdsAndViews"),
-                        viewsAndConfirmedRequests.get("eventIdsAndConfirmedRequests"));
-                break;
-            }
-            case VIEWS: {
-                Page<Event> events = eventRepository.findAll(specification, new OffsetPageRequest(from, size));
-                Map<Integer, ViewsAndConfirmedRequests> viewsAndConfirmedRequestsByEventIds =
-                        getViewsAndConfirmedRequests(events.getContent());
-                List<EventShortedForResponseDto> responseDtosByViews =
-                        eventMapper.toShortedEventDto(events.getContent(),
-                                viewsAndConfirmedRequestsByEventIds.get("eventIdsAndViews"),
-                                viewsAndConfirmedRequestsByEventIds.get("eventIdsAndConfirmedRequests"));
-
-                responseDtos = responseDtosByViews.stream()
-                        .sorted(Comparator.comparingInt(EventShortedForResponseDto::getViews))
-                        .collect(Collectors.toList());
-                break;
-            }
-        }
-        statsClient.
+        EventForPublicSpecification specification = new EventForPublicSpecification(eventFiltersForPublic);
+        List<Event> events = eventRepository.findAll(specification);
+        Map<Integer, Integer> viewsByEventId = getViews(events);
+        List<Event> eventsToReturn = events.stream()
+                .sorted(sort == SortEventsBy.EVENT_DATE ?
+                        Comparator.comparing(Event::getEventDate) :
+                        Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0)).reversed())
+                .skip(from)
+                .limit(size)
+                .collect(Collectors.toList());
+        statsClient.addHit(new HitForRequestDto(APP, uri, ip, LocalDateTime.now()));
+        return eventMapper.toShortedEventDto(eventsToReturn, viewsByEventId);
     }
 
     @Override
-    public EventForResponseDto getEventForPublic(int id, String uri, String ip) {
-        return null;
+    public EventForResponseDto getEventForPublic(int eventId, String uri, String ip) {
+        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        if (event.getState() != State.PUBLISHED) {
+            throw new EventNotFoundException(eventId);
+        }
+        statsClient.addHit(new HitForRequestDto(APP, uri, ip, LocalDateTime.now()));
+        int views = getViews(eventId);
+        return eventMapper.toEventForResponseDto(event, views);
     }
 
-    private Map<Integer, ViewsAndConfirmedRequests> getViewsAndConfirmedRequests(List<Event> events) {
-        Map<String, Event> urisAndEvents = events.stream()
-                .collect(Collectors.toMap(event -> "/events/" + event.getId(), event -> event));
-        List<HitForResponseDto> hits = statsClient.getStatistics(LocalDateTime.now().minusDays(10),
-                LocalDateTime.now(), new ArrayList<>(urisAndEvents.keySet()), false);
-        Map<Integer, Integer> eventIdsAndViews = hits.stream()
-                .collect(Collectors.toMap(hit -> urisAndEvents.get(hit.getUri()).getId(),
-                        HitForResponseDto::getHits));
-        List<EventIdWithConfirmedRequests> confirmedRequests =
-                requestRepository.findAllConfirmedByEventIds(new ArrayList<>(eventIdsAndViews.keySet()));
-        Map<Integer, Integer> eventIdsAndConfirmedRequests = confirmedRequests.stream()
-                .collect(Collectors.toMap(EventIdWithConfirmedRequests::getEventId,
-                        EventIdWithConfirmedRequests::getConfirmedRequests));
-        Map<Integer, ViewsAndConfirmedRequests> viewsAndConfirmedRequestsByEventIds = hits.stream()
-                .collect(Collectors.toMap(hit -> urisAndEvents.get(hit.getUri()).getId(), hit ->
-                        new ViewsAndConfirmedRequests(hit.getHits(),
-                                eventIdsAndConfirmedRequests.getOrDefault(urisAndEvents.get(hit.getUri()).getId(), 0))));
-
-        return viewsAndConfirmedRequestsByEventIds;
+    private Map<Integer, Integer> getViews(List<Event> events) {
+        Map<String, Integer> eventIdsByUris = events.stream()
+                .collect(Collectors.toMap(event -> "/events/" + event.getId(), Event::getId));
+        List<HitForResponseDto> hits = statsClient.getStatistics(LocalDateTime.now().minusYears(1),
+                LocalDateTime.now(), eventIdsByUris.keySet(), true);
+        return hits.stream()
+                .collect(Collectors.toMap(hit -> eventIdsByUris.get(hit.getUri()), HitForResponseDto::getHits));
     }
 
-    private Map<String, Integer> getViewsAndConfirmedRequests(int eventId) {
-        HitForResponseDto hit = statsClient.getStatistics(LocalDateTime.now().minusDays(10),
-                LocalDateTime.now(), List.of("/events/" + eventId), false).get(0);
-        EventIdWithConfirmedRequests confirmedRequests =
-                requestRepository.findAllConfirmedByEventIds(List.of(eventId)).get(0);
-        return Map.of("views", hit.getHits(),
-                "confirmedRequests", confirmedRequests.getConfirmedRequests());
+    private int getViews(int eventId) {
+        List<HitForResponseDto> hits = statsClient.getStatistics(LocalDateTime.now().minusYears(1),
+                LocalDateTime.now(), List.of("/events/" + eventId), true);
+        if (hits.isEmpty()) {
+            return 0;
+        }
+        return hits.get(0).getHits();
     }
 }
