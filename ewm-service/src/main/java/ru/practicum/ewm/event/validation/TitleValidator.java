@@ -3,7 +3,7 @@ package ru.practicum.ewm.event.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class TitleValidator  implements
+public class TitleValidator implements
         ConstraintValidator<TitleConstraint, String> {
 
     @Override

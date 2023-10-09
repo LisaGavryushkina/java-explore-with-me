@@ -9,6 +9,9 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.ewm.compilation.dto.CompilationForRequestDto;
+import ru.practicum.ewm.compilation.dto.CompilationForResponseDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationDto;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.log.Logged;
@@ -56,7 +59,7 @@ public class CompilationServiceImpl implements CompilationService {
     public CompilationForResponseDto updateCompilation(int compId, UpdateCompilationDto updateCompilationDto) {
         Compilation compilation = compilationRepository.findByIdOrThrow(compId);
         Set<Integer> newEventIds = updateCompilationDto.getEvents();
-        if(newEventIds != null && !newEventIds.isEmpty()) {
+        if (newEventIds != null && !newEventIds.isEmpty()) {
             List<Event> events = eventRepository.findAllById(newEventIds);
             List<CompilationAndEvent> compilationsAndEvents = compilationMapper.toCompilationAndEvent(compilation,
                     events);

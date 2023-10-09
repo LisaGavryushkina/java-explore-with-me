@@ -23,7 +23,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<UserDto> getUsers(@RequestParam(required = false) List<Integer> ids, @RequestParam(defaultValue = "0") int from,
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Integer> ids,
+                                  @RequestParam(defaultValue = "0") int from,
                                   @RequestParam(defaultValue = "10") int size) {
         return userService.getUsers(ids, from, size);
     }

@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.specification;
 
 import java.time.LocalDateTime;
 
@@ -11,6 +11,8 @@ import javax.persistence.criteria.Root;
 import lombok.Data;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.ewm.category.Category;
+import ru.practicum.ewm.event.Event;
+import ru.practicum.ewm.event.State;
 import ru.practicum.ewm.event.dto.EventFiltersForPublic;
 
 @Data
@@ -39,7 +41,7 @@ public class EventForPublicSpecification implements Specification<Event> {
             predicate = criteriaBuilder.and(predicate, category.get("id").in(eventCriteria.getCategories()));
         }
 
-        if(eventCriteria.getPaid() != null) {
+        if (eventCriteria.getPaid() != null) {
             predicate = criteriaBuilder.and(predicate,
                     criteriaBuilder.equal(root.get("paid"), eventCriteria.getPaid()));
         }

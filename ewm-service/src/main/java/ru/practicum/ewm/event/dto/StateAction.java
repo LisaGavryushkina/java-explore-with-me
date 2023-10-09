@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.dto;
 
 public enum StateAction {
     CANCEL_REVIEW,

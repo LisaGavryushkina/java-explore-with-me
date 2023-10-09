@@ -1,4 +1,4 @@
-package ru.practicum.ewm.compilation;
+package ru.practicum.ewm.compilation.dto;
 
 import java.util.Set;
 

@@ -12,6 +12,7 @@ import ru.practicum.ewm.category.CategoryMapper;
 import ru.practicum.ewm.event.dto.EventForResponseDto;
 import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
 import ru.practicum.ewm.event.dto.EventToAddDto;
+import ru.practicum.ewm.event.dto.Location;
 import ru.practicum.ewm.event.dto.UpdateEventDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserMapper;
@@ -111,20 +112,20 @@ public class EventMapper {
         if (description != null) {
             event.setDescription(description);
         }
-        if(eventDate != null) {
+        if (eventDate != null) {
             event.setEventDate(eventDate);
         }
-        if(location != null) {
+        if (location != null) {
             event.setLat(location.getLat());
             event.setLon(location.getLon());
         }
-        if(paid != null) {
+        if (paid != null) {
             event.setPaid(paid);
         }
-        if(participantLimit != 0) {
+        if (participantLimit != 0) {
             event.setParticipantLimit(participantLimit);
         }
-        if(title != null) {
+        if (title != null) {
             event.setTitle(title);
         }
         event.setState(state);

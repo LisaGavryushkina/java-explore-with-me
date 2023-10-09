@@ -1,4 +1,4 @@
-package ru.practicum.ewm.event;
+package ru.practicum.ewm.event.specification;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -9,6 +9,7 @@ import javax.persistence.criteria.Root;
 import lombok.Data;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.ewm.category.Category;
+import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.dto.EventFiltersForAdmin;
 import ru.practicum.ewm.user.User;
 

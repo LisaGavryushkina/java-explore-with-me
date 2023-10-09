@@ -1,4 +1,4 @@
-package ru.practicum.ewm.compilation;
+package ru.practicum.ewm.compilation.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

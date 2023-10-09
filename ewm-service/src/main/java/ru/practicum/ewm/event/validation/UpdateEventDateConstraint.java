@@ -11,10 +11,12 @@ import javax.validation.Payload;
 
 @Documented
 @Constraint(validatedBy = UpdateEventDateValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UpdateEventDateConstraint {
     String message() default "Дата и время события не могут быть раньше, чем через 2 часа от текущего момента";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

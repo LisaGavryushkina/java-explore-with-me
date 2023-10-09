@@ -27,7 +27,7 @@ public class RequestController {
     @PostMapping("/{userId}/requests")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestDto addRequest(@PathVariable int userId, @RequestParam int eventId) {
-       return requestService.addRequest(userId, eventId);
+        return requestService.addRequest(userId, eventId);
     }
 
     @PatchMapping("/{userId}/requests/{requestId}/cancel")

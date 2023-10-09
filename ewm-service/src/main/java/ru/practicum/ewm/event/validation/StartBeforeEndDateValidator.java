@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class StartBeforeEndDateValidator implements ConstraintValidator<StartBeforeEndDateConstraint, HasStartEndRange> {
+public class StartBeforeEndDateValidator implements ConstraintValidator<StartBeforeEndDateConstraint,
+        HasStartEndRange> {
 
     @Override
     public void initialize(StartBeforeEndDateConstraint constraint) {
@@ -16,7 +17,7 @@ public class StartBeforeEndDateValidator implements ConstraintValidator<StartBef
         final LocalDateTime rangeStart = bean.getRangeStart();
         final LocalDateTime rangeEnd = bean.getRangeEnd();
 
-        if(rangeEnd == null || rangeStart == null) {
+        if (rangeEnd == null || rangeStart == null) {
             return true;
         }
         return rangeStart.isBefore(rangeEnd);

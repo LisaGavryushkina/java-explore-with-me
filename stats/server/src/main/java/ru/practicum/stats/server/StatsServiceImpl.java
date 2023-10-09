@@ -31,7 +31,7 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<HitForResponseDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris,
                                                  boolean unique) {
-        if(start.isAfter(end)) {
+        if (start.isAfter(end)) {
             throw new InvalidStartEndParametersException(start, end);
         }
         List<HitsByUri> hitsByUris;

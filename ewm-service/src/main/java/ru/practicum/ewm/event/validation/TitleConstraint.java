@@ -11,10 +11,12 @@ import javax.validation.Payload;
 
 @Documented
 @Constraint(validatedBy = TitleValidator.class)
-@Target( { ElementType.METHOD, ElementType.FIELD })
+@Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TitleConstraint {
     String message() default "Загловок не должен иметь длину меньше 3 и больше 120 символов";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

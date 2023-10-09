@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 import ru.practicum.ewm.category.CategoryDto;
-import ru.practicum.ewm.event.Location;
 import ru.practicum.ewm.event.State;
 import ru.practicum.ewm.user.UserDto;
 

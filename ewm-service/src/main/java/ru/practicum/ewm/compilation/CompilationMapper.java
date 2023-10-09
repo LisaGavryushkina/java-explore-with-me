@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import ru.practicum.ewm.compilation.dto.CompilationForRequestDto;
+import ru.practicum.ewm.compilation.dto.CompilationForResponseDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationDto;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventMapper;
 import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
@@ -48,7 +51,7 @@ public class CompilationMapper {
     public Compilation updateCompilation(Compilation compilation, UpdateCompilationDto updateCompilationDto) {
         compilation.setPinned(updateCompilationDto.isPinned());
         String title = updateCompilationDto.getTitle();
-        if(title != null) {
+        if (title != null) {
             compilation.setTitle(title);
         }
         return compilation;

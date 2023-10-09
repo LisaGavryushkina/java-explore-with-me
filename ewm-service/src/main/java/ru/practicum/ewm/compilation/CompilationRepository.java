@@ -9,5 +9,6 @@ public interface CompilationRepository extends JpaRepository<Compilation, Intege
     default Compilation findByIdOrThrow(int compId) {
         return findById(compId).orElseThrow(() -> new CompilationNotFoundException(compId));
     }
+
     Page<Compilation> findAllByPinned(boolean pinned, Pageable pageable);
 }

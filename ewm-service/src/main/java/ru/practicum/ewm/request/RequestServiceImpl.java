@@ -61,7 +61,8 @@ public class RequestServiceImpl implements RequestService {
         }
         Request request;
         if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
-            request = requestRepository.save(requestMapper.toRequest(user, event, LocalDateTime.now(), Status.CONFIRMED));
+            request = requestRepository.save(requestMapper.toRequest(user, event, LocalDateTime.now(),
+                    Status.CONFIRMED));
         } else {
             request = requestRepository.save(requestMapper.toRequest(user, event, LocalDateTime.now(),
                     Status.PENDING));

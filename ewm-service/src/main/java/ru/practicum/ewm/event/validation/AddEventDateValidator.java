@@ -14,7 +14,7 @@ public class AddEventDateValidator implements
 
     @Override
     public boolean isValid(LocalDateTime eventDate,
-      ConstraintValidatorContext cxt) {
+                           ConstraintValidatorContext cxt) {
         return eventDate != null && eventDate.minusHours(2).isAfter(LocalDateTime.now());
     }
 

@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.compilation.dto.CompilationForRequestDto;
+import ru.practicum.ewm.compilation.dto.CompilationForResponseDto;
+import ru.practicum.ewm.compilation.dto.UpdateCompilationDto;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +26,8 @@ public class CompilationController {
 
     @PostMapping("/admin/compilations")
     @ResponseStatus(HttpStatus.CREATED)
-    public CompilationForResponseDto addCompilation(@RequestBody @Valid CompilationForRequestDto compilationForRequestDto) {
+    public CompilationForResponseDto addCompilation(
+            @RequestBody @Valid CompilationForRequestDto compilationForRequestDto) {
         return compilationService.addCompilation(compilationForRequestDto);
     }
 

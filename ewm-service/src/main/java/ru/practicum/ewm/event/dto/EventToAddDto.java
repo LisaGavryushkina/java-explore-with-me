@@ -10,8 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import ru.practicum.ewm.event.Location;
-import ru.practicum.ewm.event.StateAction;
 import ru.practicum.ewm.event.validation.AddEventDateConstraint;
 
 @NoArgsConstructor
