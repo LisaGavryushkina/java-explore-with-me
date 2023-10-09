@@ -9,7 +9,7 @@ import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
 public class CompilationForResponseDto {
 
     private final int id;
-    private final List<EventShortedForResponseDto> events;
     private final boolean pinned;
     private final String title;
+    private final List<EventShortedForResponseDto> events;
 }

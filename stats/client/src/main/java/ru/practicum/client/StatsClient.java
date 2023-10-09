@@ -29,7 +29,7 @@ public class StatsClient {
 
     private static final String STATS_SERVER_URL = "http://stats-server:8080";
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     private final RestTemplate rest;
 
     @Autowired
@@ -49,8 +49,8 @@ public class StatsClient {
 
         UriComponents uriComponents = UriComponentsBuilder.fromUriString("http://stats-server/stats")
                 .port(8080)
-                .queryParam("start", start.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
-                .queryParam("end", end.format(DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)))
+                .queryParam("start", start.format(DATE_TIME_FORMATTER))
+                .queryParam("end", end.format(DATE_TIME_FORMATTER))
                 .queryParam("uris", uris)
                 .queryParam("unique", unique)
                 .build();
@@ -98,17 +98,4 @@ public class StatsClient {
         return headers;
     }
 
-//    private static ResponseEntity<Object> prepareGatewayResponse(ResponseEntity<Object> response) {
-//        if (response.getStatusCode().is2xxSuccessful()) {
-//            return response;
-//        }
-//
-//        ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.status(response.getStatusCode());
-//
-//        if (response.hasBody()) {
-//            return responseBuilder.body(response.getBody());
-//        }
-//
-//        return responseBuilder.build();
-//    }
 }

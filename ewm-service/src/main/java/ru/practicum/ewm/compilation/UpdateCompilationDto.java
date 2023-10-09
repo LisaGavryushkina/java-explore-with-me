@@ -2,16 +2,13 @@ package ru.practicum.ewm.compilation;
 
 import java.util.Set;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 import lombok.Data;
 
 @Data
-public class CompilationForRequestDto {
+public class UpdateCompilationDto {
     private final Set<Integer> events;
     private final boolean pinned;
-    @NotBlank
-    @Size(max = 50)
+    @CompilationTitleConstraint
     private final String title;
+
 }

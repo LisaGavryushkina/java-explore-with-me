@@ -11,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.client.StatsClient;
-import ru.practicum.dto.HitForRequestDto;
-import ru.practicum.dto.HitForResponseDto;
 import ru.practicum.ewm.category.Category;
 import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.category.CategoryRepository;
@@ -39,6 +36,7 @@ import ru.practicum.ewm.request.RequestMapper;
 import ru.practicum.ewm.request.RequestRepository;
 import ru.practicum.ewm.request.Status;
 import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
+import ru.practicum.ewm.stats_service.StatsService;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
@@ -55,13 +53,12 @@ public class EventServiceImpl implements EventService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final CategoryRepository categoryRepository;
-    private final StatsClient statsClient;
-    public static final String APP = "ewm-service";
+    private final StatsService statsService;
 
     @Override
     public List<EventShortedForResponseDto> getInitiatorEvents(int userId, int from, int size) {
         Page<Event> events = eventRepository.findAllByInitiatorId(userId, new OffsetPageRequest(from, size));
-        Map<Integer, Integer> viewsByEventIds = getViews(events.getContent());
+        Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.map(Event::getId).getContent());
         return eventMapper.toShortedEventDto(events.getContent(), viewsByEventIds);
     }
 
@@ -79,7 +76,7 @@ public class EventServiceImpl implements EventService {
     public EventForResponseDto getEventByInitiator(int userId, int eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
-        int views = getViews(eventId);
+        int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(event, views);
     }
 
@@ -114,7 +111,7 @@ public class EventServiceImpl implements EventService {
                     categoryRepository.findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
         }
         Event toUpdate = eventMapper.updateEvent(event, updateEventDto, category, state);
-        int views = getViews(eventId);
+        int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate), views);
     }
 
@@ -173,7 +170,7 @@ public class EventServiceImpl implements EventService {
                 }
             }
         }
-        if(newStatus == Status.REJECTED) {
+        if (newStatus == Status.REJECTED) {
             requests.forEach(request -> request.setStatus(Status.REJECTED));
             rejectedRequests.addAll(requests);
         }
@@ -184,7 +181,7 @@ public class EventServiceImpl implements EventService {
     public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventFiltersForAdmin, int from, int size) {
         EventForAdminSpecification specification = new EventForAdminSpecification(eventFiltersForAdmin);
         Page<Event> events = eventRepository.findAll(specification, new OffsetPageRequest(from, size));
-        Map<Integer, Integer> viewsByEventIds = getViews(events.getContent());
+        Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.map(Event::getId).getContent());
         return eventMapper.toEventForResponseDto(events.getContent(), viewsByEventIds);
     }
 
@@ -209,7 +206,7 @@ public class EventServiceImpl implements EventService {
                     .findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
         }
         Event updated = eventMapper.updateEvent(event, updateEventDto, category, state);
-        int views = getViews(eventId);
+        int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(eventRepository.save(updated), views);
     }
 
@@ -219,7 +216,6 @@ public class EventServiceImpl implements EventService {
                 if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
                     throw new EventDateInLessThanAnHourException(event.getId());
                 }
-                //?????
                 if (event.getState() != State.PENDING && event.getState() != State.WAITING) {
                     throw new EventWithNotPendingStateCantBePublished(event.getId(), event.getState());
                 }
@@ -241,7 +237,9 @@ public class EventServiceImpl implements EventService {
 
         EventForPublicSpecification specification = new EventForPublicSpecification(eventFiltersForPublic);
         List<Event> events = eventRepository.findAll(specification);
-        Map<Integer, Integer> viewsByEventId = getViews(events);
+        Map<Integer, Integer> viewsByEventId = statsService.getViews(events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toList()));
         List<Event> eventsToReturn = events.stream()
                 .sorted(sort == SortEventsBy.EVENT_DATE ?
                         Comparator.comparing(Event::getEventDate) :
@@ -249,7 +247,7 @@ public class EventServiceImpl implements EventService {
                 .skip(from)
                 .limit(size)
                 .collect(Collectors.toList());
-        statsClient.addHit(new HitForRequestDto(APP, uri, ip, LocalDateTime.now()));
+        statsService.addHit(uri, ip);
         return eventMapper.toShortedEventDto(eventsToReturn, viewsByEventId);
     }
 
@@ -259,26 +257,9 @@ public class EventServiceImpl implements EventService {
         if (event.getState() != State.PUBLISHED) {
             throw new EventNotFoundException(eventId);
         }
-        statsClient.addHit(new HitForRequestDto(APP, uri, ip, LocalDateTime.now()));
-        int views = getViews(eventId);
+        statsService.addHit(uri, ip);
+        int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(event, views);
     }
 
-    private Map<Integer, Integer> getViews(List<Event> events) {
-        Map<String, Integer> eventIdsByUris = events.stream()
-                .collect(Collectors.toMap(event -> "/events/" + event.getId(), Event::getId));
-        List<HitForResponseDto> hits = statsClient.getStatistics(LocalDateTime.now().minusYears(1),
-                LocalDateTime.now(), eventIdsByUris.keySet(), true);
-        return hits.stream()
-                .collect(Collectors.toMap(hit -> eventIdsByUris.get(hit.getUri()), HitForResponseDto::getHits));
-    }
-
-    private int getViews(int eventId) {
-        List<HitForResponseDto> hits = statsClient.getStatistics(LocalDateTime.now().minusYears(1),
-                LocalDateTime.now(), List.of("/events/" + eventId), true);
-        if (hits.isEmpty()) {
-            return 0;
-        }
-        return hits.get(0).getHits();
-    }
 }
