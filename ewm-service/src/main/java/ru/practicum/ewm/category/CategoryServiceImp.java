@@ -15,19 +15,20 @@ import ru.practicum.ewm.pageable.OffsetPageRequest;
 @Service
 @RequiredArgsConstructor
 @Logged
-@Transactional
 public class CategoryServiceImp implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
     private final EventRepository eventRepository;
 
     @Override
+    @Transactional
     public CategoryDto addCategory(CategoryDto categoryDto) {
         Category category = categoryRepository.save(categoryMapper.toCategory(categoryDto));
         return categoryMapper.toCategoryDto(category);
     }
 
     @Override
+    @Transactional
     public CategoryDto deleteCategory(int catId) {
         Category category = categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
         List<Event> categoryEvents = eventRepository.findAllByCategoryId(catId);
@@ -39,6 +40,7 @@ public class CategoryServiceImp implements CategoryService {
     }
 
     @Override
+    @Transactional
     public CategoryDto updateCategory(int catId, CategoryDto categoryDto) {
         Category category =
                 categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));

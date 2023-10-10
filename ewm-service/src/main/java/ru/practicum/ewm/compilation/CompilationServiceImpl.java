@@ -25,7 +25,6 @@ import static java.util.stream.Collectors.toList;
 @Service
 @RequiredArgsConstructor
 @Logged
-@Transactional
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationAndEventRepository compilationAndEventRepository;
     private final CompilationRepository compilationRepository;
@@ -34,6 +33,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final StatsService statsService;
 
     @Override
+    @Transactional
     public CompilationForResponseDto addCompilation(CompilationForRequestDto compilationForRequestDto) {
         Compilation compilation = compilationRepository.save(compilationMapper.toCompilation(compilationForRequestDto));
         Set<Integer> eventIds = compilationForRequestDto.getEvents();
@@ -48,6 +48,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public Compilation deleteCompilationById(int compId) {
         Compilation compilation = compilationRepository.findByIdOrThrow(compId);
         compilationAndEventRepository.deleteAllByCompilationId(compId);
@@ -56,6 +57,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationForResponseDto updateCompilation(int compId, UpdateCompilationDto updateCompilationDto) {
         Compilation compilation = compilationRepository.findByIdOrThrow(compId);
         Set<Integer> newEventIds = updateCompilationDto.getEvents();

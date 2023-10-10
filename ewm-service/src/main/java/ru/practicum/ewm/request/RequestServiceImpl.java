@@ -25,7 +25,6 @@ import ru.practicum.ewm.user.UserRepository;
 @Service
 @RequiredArgsConstructor
 @Logged
-@Transactional
 public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
@@ -42,6 +41,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto addRequest(int userId, int eventId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         boolean isExist = requestRepository.existsByRequesterIdAndEventId(userId, eventId);
@@ -71,6 +71,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public RequestDto cancelRequest(int userId, int requestId) {
         Request request =
                 requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException(requestId));

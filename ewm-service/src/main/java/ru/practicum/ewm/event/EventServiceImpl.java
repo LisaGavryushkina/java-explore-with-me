@@ -47,7 +47,6 @@ import ru.practicum.ewm.user.UserRepository;
 @Service
 @RequiredArgsConstructor
 @Logged
-@Transactional
 public class EventServiceImpl implements EventService {
 
     private final EventRepository eventRepository;
@@ -66,6 +65,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventForResponseDto addEvent(int userId, EventToAddDto eventToAddDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Category category =
@@ -96,6 +96,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventForResponseDto updateEventByInitiator(int userId, int eventId, UpdateEventDto updateEventDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
@@ -129,6 +130,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public UpdatedRequestsStatusDto updateRequestsStatusByInitiator(int userId, int eventId,
                                                                     UpdateRequestsStatusDto updateRequestsStatusDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
@@ -189,6 +191,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventForResponseDto updateEventByAdmin(int eventId, UpdateEventDto updateEventDto) {
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         LocalDateTime newEventDate = updateEventDto.getEventDate();

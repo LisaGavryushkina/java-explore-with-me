@@ -14,7 +14,6 @@ import ru.practicum.ewm.pageable.OffsetPageRequest;
 @Service
 @RequiredArgsConstructor
 @Logged
-@Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -32,12 +31,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto addUser(UserDto userDto) {
         User user = userRepository.save(userMapper.toUser(userDto));
         return userMapper.toUserDtoForAdmin(user);
     }
 
     @Override
+    @Transactional
     public User deleteUser(int userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         userRepository.deleteById(userId);
