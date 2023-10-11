@@ -3,8 +3,8 @@ package ru.practicum.stats.server;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import ru.practicum.HitForRequestDto;
-import ru.practicum.HitForResponseDto;
+import ru.practicum.dto.HitForRequestDto;
+import ru.practicum.dto.HitForResponseDto;
 
 public interface StatsService {
 

@@ -1,8 +1,8 @@
 package ru.practicum.stats.server;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.HitForRequestDto;
-import ru.practicum.HitForResponseDto;
+import ru.practicum.dto.HitForRequestDto;
+import ru.practicum.dto.HitForResponseDto;
 
 import static ru.practicum.stats.server.StatsRepository.HitsByUri;
 

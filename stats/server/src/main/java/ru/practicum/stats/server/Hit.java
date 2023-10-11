@@ -9,33 +9,27 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Data;
 
 @Entity
 @Table(name = "hit")
-@ToString
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class Hit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private final int id;
 
     @Column(name = "app", nullable = false)
-    private String app;
+    private final String app;
 
     @Column(name = "uri", nullable = false)
-    private String uri;
+    private final String uri;
 
     @Column(name = "ip", nullable = false)
-    private String ip;
+    private final String ip;
 
     @Column(name = "visited", nullable = false)
-    private LocalDateTime visited;
+    private final LocalDateTime visited;
 
     @Override
     public boolean equals(Object o) {

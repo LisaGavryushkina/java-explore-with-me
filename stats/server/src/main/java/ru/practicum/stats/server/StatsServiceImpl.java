@@ -9,8 +9,8 @@ import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.HitForRequestDto;
-import ru.practicum.HitForResponseDto;
+import ru.practicum.dto.HitForRequestDto;
+import ru.practicum.dto.HitForResponseDto;
 
 import static ru.practicum.stats.server.StatsRepository.HitsByUri;
 
@@ -31,8 +31,11 @@ public class StatsServiceImpl implements StatsService {
     @Override
     public List<HitForResponseDto> getStatistics(LocalDateTime start, LocalDateTime end, List<String> uris,
                                                  boolean unique) {
+        if (start.isAfter(end)) {
+            throw new InvalidStartEndParametersException(start, end);
+        }
         List<HitsByUri> hitsByUris;
-        if (uris != null) {
+        if (uris != null && !uris.isEmpty()) {
             if (unique) {
                 hitsByUris = statsRepository.findAllUniqueHitsByDateAndUris(start, end, uris);
             } else {

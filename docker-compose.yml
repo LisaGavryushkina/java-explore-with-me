@@ -13,7 +13,6 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
 
-
   stats-db:
     image: postgres:14-alpine
     container_name: stats-db
@@ -25,7 +24,6 @@ services:
       - POSTGRES_STATS_DB=stats
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-
 
   ewm-service:
     build: ewm-service
@@ -41,7 +39,6 @@ services:
       - SPRING_MAIN_DATASOURCE_URL=jdbc:postgresql://ewm-db:6432/ewm
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-
 
   ewm-db:
     image: postgres:14-alpine
