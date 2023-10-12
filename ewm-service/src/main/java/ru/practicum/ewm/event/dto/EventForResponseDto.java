@@ -26,5 +26,6 @@ public class EventForResponseDto {
     private final State state;
     private final String title;
     private final int views;
+    private final float rating;
 
 }

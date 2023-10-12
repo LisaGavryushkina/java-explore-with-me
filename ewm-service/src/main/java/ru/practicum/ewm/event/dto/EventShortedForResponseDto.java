@@ -18,5 +18,6 @@ public class EventShortedForResponseDto {
     private final boolean paid;
     private final String title;
     private final int views;
+    private final float rating;
 
 }

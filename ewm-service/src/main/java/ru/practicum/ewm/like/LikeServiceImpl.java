@@ -1,6 +1,5 @@
 package ru.practicum.ewm.like;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -36,9 +35,13 @@ public class LikeServiceImpl implements LikeService {
                 userRepository.findById(participantId).orElseThrow(() -> new UserNotFoundException(participantId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         Optional<Request> optionalRequest = requestRepository.findByRequesterIdAndEventId(participantId, eventId);
-        if (optionalRequest.isEmpty() || optionalRequest.get().getStatus() != Status.CONFIRMED ||
-                event.getEventDate().isAfter(LocalDateTime.now())) {
+        if (optionalRequest.isEmpty() || optionalRequest.get().getStatus() != Status.CONFIRMED) {
+//            || event.getEventDate().isAfter(LocalDateTime.now())) {
             throw new OnlyParticipantsCanRateEventException();
+        }
+        Optional<Like> optionalLike = likeRepository.findByParticipantIdAndEventId(participantId, eventId);
+        if(optionalLike.isPresent()) {
+            throw new DuplicateRatingException();
         }
         Like like = likeRepository.save(likeMapper.toLike(participant, event, isLike));
         return likeMapper.toLikeDto(like);

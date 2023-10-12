@@ -246,10 +246,27 @@ public class EventServiceImpl implements EventService {
         Map<Integer, Integer> viewsByEventId = statsService.getViews(events.stream()
                 .map(Event::getId)
                 .collect(Collectors.toList()));
+        Comparator<Event> comparator;
+        switch (sort) {
+            case EVENT_DATE:
+                comparator = Comparator.comparing(Event::getEventDate);
+                break;
+            case VIEWS:
+                comparator =
+                        Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0)).reversed();
+                break;
+            case RATING:
+                comparator = Comparator.<Event>comparingDouble(Event::getRating).reversed();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + sort);
+        }
         List<Event> eventsToReturn = events.stream()
-                .sorted(sort == SortEventsBy.EVENT_DATE ?
-                        Comparator.comparing(Event::getEventDate) :
-                        Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0)).reversed())
+                .sorted(comparator)
+//                .sorted(sort == SortEventsBy.EVENT_DATE ?
+//                        Comparator.comparing(Event::getEventDate) :
+//                        Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0))
+//                        .reversed())
                 .skip(from)
                 .limit(size)
                 .collect(Collectors.toList());

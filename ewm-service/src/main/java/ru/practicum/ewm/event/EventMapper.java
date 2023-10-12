@@ -34,7 +34,8 @@ public class EventMapper {
                         userMapper.toUserDto(event.getInitiator()),
                         event.isPaid(),
                         event.getTitle(),
-                        eventIdsAndViews.getOrDefault(event.getId(), 0)))
+                        eventIdsAndViews.getOrDefault(event.getId(), 0),
+                        event.getRating()))
                 .collect(Collectors.toList());
     }
 
@@ -47,7 +48,8 @@ public class EventMapper {
                 userMapper.toUserDto(event.getInitiator()),
                 event.isPaid(),
                 event.getTitle(),
-                views);
+                views,
+                event.getRating());
     }
 
     public Event toEvent(EventToAddDto eventForRequestDto, Category category, User user, LocalDateTime now,
@@ -67,7 +69,9 @@ public class EventMapper {
                 null,
                 eventForRequestDto.isRequestModeration(),
                 state,
-                eventForRequestDto.getTitle());
+                eventForRequestDto.getTitle(),
+                0,
+                0);
     }
 
     public EventForResponseDto toEventForResponseDto(Event event, int views) {
@@ -86,7 +90,8 @@ public class EventMapper {
                 event.isRequestModeration(),
                 event.getState(),
                 event.getTitle(),
-                views);
+                views,
+                event.getRating());
     }
 
     public List<EventForResponseDto> toEventForResponseDto(List<Event> events, Map<Integer, Integer> eventIdsAndViews) {
