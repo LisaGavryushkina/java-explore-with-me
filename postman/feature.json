@@ -7,7 +7,7 @@
     },
     "item": [
         {
-            "name": "Добавление пользователя 1",
+            "name": "Добавление пользователя 136",
             "event": [
                 {
                     "listen": "test",
@@ -24,7 +24,7 @@
                             "\r",
                             "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
                             "pm.expect(target).to.have.property('id');\r",
-                            "pm.expect(target.id, '\"id\" должен быть равен 1').to.eql(1);\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 136').to.eql(136);\r",
                             "pm.expect(target).to.have.property('name');\r",
                             "pm.expect(target).to.have.property('email');\r",
                             "pm.expect(target).to.have.property('rating');\r",
@@ -73,7 +73,7 @@
             "response": []
         },
         {
-            "name": "Добавление категории 1",
+            "name": "Добавление категории 121",
             "event": [
                 {
                     "listen": "test",
@@ -90,7 +90,7 @@
                             "\r",
                             "pm.test(\"Категория должна содержать поля: id, name\", function () {\r",
                             "pm.expect(target).to.have.property('id');\r",
-                            "pm.expect(target.id, '\"id\" должен быть равен 1').to.eql(1);\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 121').to.eql(121);\r",
                             "pm.expect(target).to.have.property('name');\r",
                             "});"
                         ],
@@ -135,7 +135,7 @@
             "response": []
         },
         {
-            "name": "Добавление события 1 от пользователя 1",
+            "name": "Добавление события 106 от пользователя 136",
             "event": [
                 {
                     "listen": "prerequest",
@@ -168,7 +168,7 @@
                             "});\r",
                             "\r",
                             "pm.test(function () {\r",
-                            "pm.expect(target.id).to.eql(1, \"Id события должен быть равен 1\");\r",
+                            "pm.expect(target.id).to.eql(106, \"Id события должен быть равен 106\");\r",
                             "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
                             "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
                             "});\r",
@@ -194,7 +194,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\r\n    \"annotation\" : \"Незабываемый концерт под звездным небом\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"56.81\",\r\n        \"lon\" : \"32.74\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Концерт\"\r\n}"
+                    "raw": "{\r\n    \"annotation\" : \"Незабываемый концерт под звездным небом\",\r\n    \"category\" : \"121\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"56.81\",\r\n        \"lon\" : \"32.74\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Концерт\"\r\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/users/:userId/events",
@@ -209,7 +209,7 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "1"
+                            "value": "136"
                         }
                     ]
                 }
@@ -217,7 +217,7 @@
             "response": []
         },
         {
-            "name": "Публикация события 1 админом",
+            "name": "Публикация события 106 админом",
             "event": [
                 {
                     "listen": "test",
@@ -270,7 +270,7 @@
                     "variable": [
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -278,7 +278,7 @@
             "response": []
         },
         {
-            "name": "Добавление пользователя 2",
+            "name": "Добавление пользователя 137",
             "event": [
                 {
                     "listen": "test",
@@ -295,7 +295,7 @@
                             "\r",
                             "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
                             "pm.expect(target).to.have.property('id');\r",
-                            "pm.expect(target.id, '\"id\" должен быть равен 2').to.eql(2);\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 137').to.eql(137);\r",
                             "pm.expect(target).to.have.property('name');\r",
                             "pm.expect(target).to.have.property('email');\r",
                             "pm.expect(target).to.have.property('rating');\r",
@@ -344,7 +344,7 @@
             "response": []
         },
         {
-            "name": "Добавление запроса на участие в событии 1 от пользователя 2",
+            "name": "Добавление запроса на участие в событии 106 от пользователя 137",
             "event": [
                 {
                     "listen": "test",
@@ -385,7 +385,7 @@
                     }
                 ],
                 "url": {
-                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=1",
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=106",
                     "host": [
                         "{{baseUrl}}"
                     ],
@@ -397,13 +397,13 @@
                     "query": [
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ],
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "2"
+                            "value": "137"
                         }
                     ]
                 }
@@ -411,7 +411,7 @@
             "response": []
         },
         {
-            "name": "Добавление лайка от пользователя 2 событию 1",
+            "name": "Добавление лайка от пользователя 137 событию 106",
             "event": [
                 {
                     "listen": "test",
@@ -434,8 +434,8 @@
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
                             "    pm.expect(target.id).equal(1);\r",
-                            "    pm.expect(target.participantId).equal(2);\r",
-                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(137);\r",
+                            "    pm.expect(target.eventId).equal(106);\r",
                             "    pm.expect(target.like).equal(true);\r",
                             "});\r",
                             ""
@@ -474,11 +474,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "2"
+                            "value": "137"
                         },
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -486,7 +486,7 @@
             "response": []
         },
         {
-            "name": "Повторное добавление лайка от пользователя 2 событию 1",
+            "name": "Повторное добавление лайка от пользователя 137 событию 106",
             "event": [
                 {
                     "listen": "test",
@@ -531,11 +531,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "2"
+                            "value": "137"
                         },
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -566,8 +566,8 @@
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
                             "    pm.expect(target.id).equal(1);\r",
-                            "    pm.expect(target.participantId).equal(2);\r",
-                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(137);\r",
+                            "    pm.expect(target.eventId).equal(106);\r",
                             "    pm.expect(target.like).equal(true);\r",
                             "});"
                         ],
@@ -605,7 +605,7 @@
             "response": []
         },
         {
-            "name": "Получение события 1 после лайка",
+            "name": "Получение события 106 после лайка",
             "event": [
                 {
                     "listen": "test",
@@ -655,7 +655,7 @@
                     "variable": [
                         {
                             "key": "id",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -751,7 +751,7 @@
             "response": []
         },
         {
-            "name": "Добавление пользователя 3",
+            "name": "Добавление пользователя 138",
             "event": [
                 {
                     "listen": "test",
@@ -768,7 +768,7 @@
                             "\r",
                             "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
                             "pm.expect(target).to.have.property('id');\r",
-                            "pm.expect(target.id, '\"id\" должен быть равен 3').to.eql(3);\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 138').to.eql(138);\r",
                             "pm.expect(target).to.have.property('name');\r",
                             "pm.expect(target).to.have.property('email');\r",
                             "pm.expect(target).to.have.property('rating');\r",
@@ -817,7 +817,7 @@
             "response": []
         },
         {
-            "name": "Добавление дизлайка событию 1  от пользователя 3, не принявшего участие",
+            "name": "Добавление дизлайка событию 106  от пользователя 138, не принявшего участие",
             "event": [
                 {
                     "listen": "test",
@@ -862,11 +862,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         },
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -874,7 +874,7 @@
             "response": []
         },
         {
-            "name": "Добавление запроса на участие в событии 1 от пользователя 3",
+            "name": "Добавление запроса на участие в событии 106 от пользователя 138",
             "event": [
                 {
                     "listen": "test",
@@ -915,7 +915,7 @@
                     }
                 ],
                 "url": {
-                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=1",
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=106",
                     "host": [
                         "{{baseUrl}}"
                     ],
@@ -927,13 +927,13 @@
                     "query": [
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ],
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         }
                     ]
                 }
@@ -941,7 +941,7 @@
             "response": []
         },
         {
-            "name": "Добавление дизлайка от пользователя 3 событию 1",
+            "name": "Добавление дизлайка от пользователя 138 событию 106",
             "event": [
                 {
                     "listen": "test",
@@ -964,8 +964,8 @@
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
                             "    pm.expect(target.id).equal(2);\r",
-                            "    pm.expect(target.participantId).equal(3);\r",
-                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(138);\r",
+                            "    pm.expect(target.eventId).equal(106);\r",
                             "    pm.expect(target.like).equal(false);\r",
                             "});\r",
                             ""
@@ -1004,11 +1004,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         },
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -1016,7 +1016,7 @@
             "response": []
         },
         {
-            "name": "Добавление лайка после удаления от пользователя 2 событию 1",
+            "name": "Добавление лайка после удаления от пользователя 137 событию 106",
             "event": [
                 {
                     "listen": "test",
@@ -1038,8 +1038,8 @@
                             "});\r",
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
-                            "    pm.expect(target.participantId).equal(2);\r",
-                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(137);\r",
+                            "    pm.expect(target.eventId).equal(106);\r",
                             "    pm.expect(target.like).equal(true);\r",
                             "});\r",
                             ""
@@ -1078,11 +1078,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "2"
+                            "value": "137"
                         },
                         {
                             "key": "eventId",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -1090,7 +1090,7 @@
             "response": []
         },
         {
-            "name": "Получение события 1 после лайка и дизлайка",
+            "name": "Получение события 106 после лайка и дизлайка",
             "event": [
                 {
                     "listen": "test",
@@ -1140,7 +1140,7 @@
                     "variable": [
                         {
                             "key": "id",
-                            "value": "1"
+                            "value": "106"
                         }
                     ]
                 }
@@ -1148,7 +1148,7 @@
             "response": []
         },
         {
-            "name": "Добавление события 2 от пользователя 2",
+            "name": "Добавление события 107 от пользователя 137",
             "event": [
                 {
                     "listen": "prerequest",
@@ -1181,7 +1181,7 @@
                             "});\r",
                             "\r",
                             "pm.test(function () {\r",
-                            "pm.expect(target.id).to.eql(2, \"Id события должен быть равен 2\");\r",
+                            "pm.expect(target.id).to.eql(107, \"Id события должен быть равен 2\");\r",
                             "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
                             "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
                             "});\r",
@@ -1207,7 +1207,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\r\n    \"annotation\" : \"Рок-концерт в Albert hall\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"60.10\",\r\n        \"lon\" : \"41.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Рок-концерт\"\r\n}"
+                    "raw": "{\r\n    \"annotation\" : \"Рок-концерт в Albert hall\",\r\n    \"category\" : \"121\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"60.10\",\r\n        \"lon\" : \"41.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Рок-концерт\"\r\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/users/:userId/events",
@@ -1222,7 +1222,7 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "2"
+                            "value": "137"
                         }
                     ]
                 }
@@ -1230,7 +1230,7 @@
             "response": []
         },
         {
-            "name": "Публикация события 2 админом",
+            "name": "Публикация события 107 админом",
             "event": [
                 {
                     "listen": "test",
@@ -1283,7 +1283,7 @@
                     "variable": [
                         {
                             "key": "eventId",
-                            "value": "2"
+                            "value": "107"
                         }
                     ]
                 }
@@ -1291,7 +1291,7 @@
             "response": []
         },
         {
-            "name": "Добавление запроса на участие в событии 2 от пользователя 1",
+            "name": "Добавление запроса на участие в событии 107 от пользователя 136",
             "event": [
                 {
                     "listen": "test",
@@ -1324,7 +1324,7 @@
                     }
                 ],
                 "url": {
-                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=2",
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=107",
                     "host": [
                         "{{baseUrl}}"
                     ],
@@ -1336,13 +1336,13 @@
                     "query": [
                         {
                             "key": "eventId",
-                            "value": "2"
+                            "value": "107"
                         }
                     ],
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "1"
+                            "value": "136"
                         }
                     ]
                 }
@@ -1350,7 +1350,7 @@
             "response": []
         },
         {
-            "name": "Добавление запроса на участие в событии 2 от пользователя 3",
+            "name": "Добавление запроса на участие в событии 107 от пользователя 138",
             "event": [
                 {
                     "listen": "test",
@@ -1383,7 +1383,7 @@
                     }
                 ],
                 "url": {
-                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=2",
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=107",
                     "host": [
                         "{{baseUrl}}"
                     ],
@@ -1395,13 +1395,13 @@
                     "query": [
                         {
                             "key": "eventId",
-                            "value": "2"
+                            "value": "107"
                         }
                     ],
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         }
                     ]
                 }
@@ -1409,7 +1409,7 @@
             "response": []
         },
         {
-            "name": "Добавление лайка от пользователя 1 событию 2",
+            "name": "Добавление лайка от пользователя 136 событию 107",
             "event": [
                 {
                     "listen": "test",
@@ -1431,8 +1431,8 @@
                             "});\r",
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
-                            "    pm.expect(target.participantId).equal(1);\r",
-                            "    pm.expect(target.eventId).equal(2);\r",
+                            "    pm.expect(target.participantId).equal(136);\r",
+                            "    pm.expect(target.eventId).equal(107);\r",
                             "    pm.expect(target.like).equal(true);\r",
                             "});\r",
                             ""
@@ -1471,11 +1471,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "1"
+                            "value": "136"
                         },
                         {
                             "key": "eventId",
-                            "value": "2"
+                            "value": "107"
                         }
                     ]
                 }
@@ -1483,7 +1483,7 @@
             "response": []
         },
         {
-            "name": "Добавление лайка от пользователя 3 событию 2",
+            "name": "Добавление лайка от пользователя 138 событию 107",
             "event": [
                 {
                     "listen": "test",
@@ -1505,8 +1505,8 @@
                             "});\r",
                             "\r",
                             "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
-                            "    pm.expect(target.participantId).equal(3);\r",
-                            "    pm.expect(target.eventId).equal(2);\r",
+                            "    pm.expect(target.participantId).equal(138);\r",
+                            "    pm.expect(target.eventId).equal(107);\r",
                             "    pm.expect(target.like).equal(true);\r",
                             "});\r",
                             ""
@@ -1545,11 +1545,11 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         },
                         {
                             "key": "eventId",
-                            "value": "2"
+                            "value": "107"
                         }
                     ]
                 }
@@ -1557,7 +1557,7 @@
             "response": []
         },
         {
-            "name": "Добавление события 3 от пользователя 3",
+            "name": "Добавление события 108 от пользователя 138",
             "event": [
                 {
                     "listen": "prerequest",
@@ -1590,7 +1590,7 @@
                             "});\r",
                             "\r",
                             "pm.test(function () {\r",
-                            "pm.expect(target.id).to.eql(3, \"Id события должен быть равен 3\");\r",
+                            "pm.expect(target.id).to.eql(108, \"Id события должен быть равен 108\");\r",
                             "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
                             "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
                             "});\r",
@@ -1616,7 +1616,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\r\n    \"annotation\" : \"Сказка на льду в Ледовом Дворце\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"91.10\",\r\n        \"lon\" : \"75.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Сказка на льду\"\r\n}"
+                    "raw": "{\r\n    \"annotation\" : \"Сказка на льду в Ледовом Дворце\",\r\n    \"category\" : \"121\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"91.10\",\r\n        \"lon\" : \"75.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Сказка на льду\"\r\n}"
                 },
                 "url": {
                     "raw": "{{baseUrl}}/users/:userId/events",
@@ -1631,7 +1631,7 @@
                     "variable": [
                         {
                             "key": "userId",
-                            "value": "3"
+                            "value": "138"
                         }
                     ]
                 }
@@ -1639,7 +1639,7 @@
             "response": []
         },
         {
-            "name": "Публикация события 3 админом",
+            "name": "Публикация события 108 админом",
             "event": [
                 {
                     "listen": "test",
@@ -1692,7 +1692,7 @@
                     "variable": [
                         {
                             "key": "eventId",
-                            "value": "3"
+                            "value": "108"
                         }
                     ]
                 }
@@ -1725,9 +1725,9 @@
                             "\r",
                             "pm.test(\"События должны быть отсортированы по рейтингу в порядке убывания\", function () {\r",
                             "pm.expect(target.length).to.eql(3);\r",
-                            "pm.expect(target[0].id).to.eql(2);\r",
-                            "pm.expect(target[1].id).to.eql(1);\r",
-                            "pm.expect(target[2].id).to.eql(3);\r",
+                            "pm.expect(target[0].id).to.eql(107);\r",
+                            "pm.expect(target[1].id).to.eql(106);\r",
+                            "pm.expect(target[2].id).to.eql(108);\r",
                             "pm.expect(target[0].rating).to.eql(10.0);\r",
                             "pm.expect(target[1].rating).to.eql(5.0);\r",
                             "pm.expect(target[2].rating).to.eql(0.0);\r",
@@ -1747,7 +1747,7 @@
                     }
                 ],
                 "url": {
-                    "raw": "{{baseUrl}}/events?sort=RATING",
+                    "raw": "{{baseUrl}}/events?categories=121&sort=RATING",
                     "host": [
                         "{{baseUrl}}"
                     ],
@@ -1755,6 +1755,10 @@
                         "events"
                     ],
                     "query": [
+                        {
+                            "key": "categories",
+                            "value": "121"
+                        },
                         {
                             "key": "sort",
                             "value": "RATING"
