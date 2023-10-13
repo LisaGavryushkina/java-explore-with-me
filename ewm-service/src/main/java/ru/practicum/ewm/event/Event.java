@@ -102,11 +102,11 @@ public class Event {
     @Formula("(select count(*) from likes as l where l.event_id = id and l.is_like = false)")
     private int dislikes;
 
-    public float getRating () {
-        if(likes == 0) {
+    public float getRating() {
+        if (likes == 0) {
             return 0.0F;
         }
-        return (float)likes / (likes + dislikes) * 10;
+        return (float) likes / (likes + dislikes) * 10;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package ru.practicum.ewm.event;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -140,35 +139,36 @@ public class EventServiceImpl implements EventService {
         if (!statusIsPending) {
             throw new NotPendingRequestStatusCantBeUpdated();
         }
-        Status newStatus = updateRequestsStatusDto.getStatus();
-        List<Request> confirmedRequests = new ArrayList<>();
-        List<Request> rejectedRequests = new ArrayList<>();
-        if (newStatus == Status.CONFIRMED) {
-            int amountOfConfirmedRequests = event.getConfirmedRequests();
-            int i = 0;
-            while (amountOfConfirmedRequests < limit && i < requests.size()) {
-                Request request = requests.get(i);
-                request.setStatus(newStatus);
-                requestRepository.save(request);
-                confirmedRequests.add(request);
-                i++;
-                amountOfConfirmedRequests++;
-            }
-            List<Request> pendingRequestsToCancel = new ArrayList<>();
-            if (amountOfConfirmedRequests == limit) {
-                pendingRequestsToCancel = requestRepository.findAllByEventIdAndStatus(eventId, Status.PENDING);
-                if (!pendingRequestsToCancel.isEmpty()) {
-                    pendingRequestsToCancel.forEach(request -> request.setStatus(Status.CANCELED));
-                    pendingRequestsToCancel.forEach(requestRepository::save);
-                    rejectedRequests.addAll(pendingRequestsToCancel);
-                }
-            }
+
+        if (updateRequestsStatusDto.getStatus() == Status.REJECTED) {
+            return rejectRequests(requests);
         }
-        if (newStatus == Status.REJECTED) {
-            requests.forEach(request -> request.setStatus(Status.REJECTED));
-            rejectedRequests.addAll(requests);
+        return processRequests(event, requests);
+    }
+
+    private UpdatedRequestsStatusDto processRequests(Event event, List<Request> requests) {
+        int limit = event.getParticipantLimit();
+        List<Request> confirmedRequests;
+        List<Request> rejectedRequests = List.of();
+        int alreadyConfirmed = event.getConfirmedRequests();
+        int eventsToConfirm = Integer.min(limit - alreadyConfirmed, requests.size());
+        confirmedRequests = setStatus(requests.subList(0, eventsToConfirm), Status.CONFIRMED);
+
+        if (eventsToConfirm + alreadyConfirmed == limit) {
+            rejectedRequests = setStatus(requestRepository.findAllByEventIdAndStatus(event.getId(), Status.PENDING),
+                    Status.CANCELED);
         }
         return requestMapper.toUpdatedRequestsStatusDto(confirmedRequests, rejectedRequests);
+    }
+
+    private UpdatedRequestsStatusDto rejectRequests(List<Request> requests) {
+        requests = setStatus(requests, Status.REJECTED);
+        return requestMapper.toUpdatedRequestsStatusDto(List.of(), requests);
+    }
+
+    private List<Request> setStatus(List<Request> requests, Status status) {
+        requests.forEach(request -> request.setStatus(status));
+        return requestRepository.saveAll(requests);
     }
 
     @Override
