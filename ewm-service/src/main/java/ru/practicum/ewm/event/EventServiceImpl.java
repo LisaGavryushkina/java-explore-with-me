@@ -42,6 +42,7 @@ import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
 import ru.practicum.ewm.stats_service.StatsService;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserNotFoundException;
+import ru.practicum.ewm.user.UserRatingService;
 import ru.practicum.ewm.user.UserRepository;
 
 @Service
@@ -52,6 +53,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final UserRepository userRepository;
+    private final UserRatingService userRatingService;
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final CategoryRepository categoryRepository;
@@ -61,7 +63,9 @@ public class EventServiceImpl implements EventService {
     public List<EventShortedForResponseDto> getInitiatorEvents(int userId, int from, int size) {
         Page<Event> events = eventRepository.findAllByInitiatorId(userId, new OffsetPageRequest(from, size));
         Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.map(Event::getId).getContent());
-        return eventMapper.toShortedEventDto(events.getContent(), viewsByEventIds);
+        return eventMapper.toShortedEventDtoForInitiator(events.getContent(),
+                userRatingService.getLikesAndTotal(userId),
+                viewsByEventIds);
     }
 
     @Override
@@ -72,7 +76,7 @@ public class EventServiceImpl implements EventService {
                 categoryRepository.findById(eventToAddDto.getCategory()).orElseThrow(() -> new CategoryNotFoundException(eventToAddDto.getCategory()));
         Event event = eventRepository.save(eventMapper.toEvent(eventToAddDto, category, user,
                 LocalDateTime.now(), State.PENDING));
-        return eventMapper.toEventForResponseDto(event, 0);
+        return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), 0);
     }
 
     @Override
@@ -80,19 +84,7 @@ public class EventServiceImpl implements EventService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
         int views = statsService.getViews(eventId);
-        return eventMapper.toEventForResponseDto(event, views);
-    }
-
-    private State determineStateForInitiator(StateAction stateAction) {
-        switch (stateAction) {
-            case REJECT_EVENT:
-            case CANCEL_REVIEW:
-                return State.CANCELED;
-            case SEND_TO_REVIEW:
-                return State.PENDING;
-            default:
-                throw new IllegalStateException("Unexpected value: " + stateAction);
-        }
+        return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), views);
     }
 
     @Override
@@ -116,7 +108,8 @@ public class EventServiceImpl implements EventService {
         }
         Event toUpdate = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
-        return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate), views);
+        return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate),
+                userRatingService.getLikesAndTotal(userId), views);
     }
 
     @Override
@@ -185,9 +178,12 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventForResponseDto> getEventsForAdmin(EventFiltersForAdmin eventFiltersForAdmin, int from, int size) {
         EventForAdminSpecification specification = new EventForAdminSpecification(eventFiltersForAdmin);
-        Page<Event> events = eventRepository.findAll(specification, new OffsetPageRequest(from, size));
-        Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.map(Event::getId).getContent());
-        return eventMapper.toEventForResponseDto(events.getContent(), viewsByEventIds);
+        Page<Event> pageEvents = eventRepository.findAll(specification, new OffsetPageRequest(from, size));
+        List<Event> events = pageEvents.getContent();
+        Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toList()));
+        return eventMapper.toEventForResponseDto(events, userRatingService.getLikesAndTotal(events), viewsByEventIds);
     }
 
     @Override
@@ -213,27 +209,8 @@ public class EventServiceImpl implements EventService {
         }
         Event updated = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
-        return eventMapper.toEventForResponseDto(eventRepository.save(updated), views);
-    }
-
-    private State determineStateForAdmin(StateAction stateAction, Event event) {
-        switch (stateAction) {
-            case PUBLISH_EVENT:
-                if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
-                    throw new EventDateInLessThanAnHourException(event.getId());
-                }
-                if (event.getState() != State.PENDING && event.getState() != State.WAITING) {
-                    throw new EventWithNotPendingStateCantBePublished(event.getId(), event.getState());
-                }
-                return State.PUBLISHED;
-            case REJECT_EVENT:
-                if (event.getState() == State.PUBLISHED) {
-                    throw new PublishedEventCantBeUpdatedException(event.getId());
-                }
-                return State.CANCELED;
-            default:
-                throw new IllegalStateException("Unexpected value: " + stateAction);
-        }
+        return eventMapper.toEventForResponseDto(eventRepository.save(updated),
+                userRatingService.getLikesAndTotal(event.getInitiator().getId()), views);
     }
 
     @Override
@@ -263,15 +240,13 @@ public class EventServiceImpl implements EventService {
         }
         List<Event> eventsToReturn = events.stream()
                 .sorted(comparator)
-//                .sorted(sort == SortEventsBy.EVENT_DATE ?
-//                        Comparator.comparing(Event::getEventDate) :
-//                        Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0))
-//                        .reversed())
                 .skip(from)
                 .limit(size)
                 .collect(Collectors.toList());
         statsService.addHit(uri, ip);
-        return eventMapper.toShortedEventDto(eventsToReturn, viewsByEventId);
+        return eventMapper.toShortedEventDto(eventsToReturn,
+                userRatingService.getLikesAndTotal(eventsToReturn),
+                viewsByEventId);
     }
 
     @Override
@@ -282,7 +257,41 @@ public class EventServiceImpl implements EventService {
         }
         statsService.addHit(uri, ip);
         int views = statsService.getViews(eventId);
-        return eventMapper.toEventForResponseDto(event, views);
+        return eventMapper.toEventForResponseDto(event,
+                userRatingService.getLikesAndTotal(event.getInitiator().getId()),
+                views);
+    }
+
+    private State determineStateForInitiator(StateAction stateAction) {
+        switch (stateAction) {
+            case REJECT_EVENT:
+            case CANCEL_REVIEW:
+                return State.CANCELED;
+            case SEND_TO_REVIEW:
+                return State.PENDING;
+            default:
+                throw new IllegalStateException("Unexpected value: " + stateAction);
+        }
+    }
+
+    private State determineStateForAdmin(StateAction stateAction, Event event) {
+        switch (stateAction) {
+            case PUBLISH_EVENT:
+                if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1))) {
+                    throw new EventDateInLessThanAnHourException(event.getId());
+                }
+                if (event.getState() != State.PENDING && event.getState() != State.WAITING) {
+                    throw new EventWithNotPendingStateCantBePublished(event.getId(), event.getState());
+                }
+                return State.PUBLISHED;
+            case REJECT_EVENT:
+                if (event.getState() == State.PUBLISHED) {
+                    throw new PublishedEventCantBeUpdatedException(event.getId());
+                }
+                return State.CANCELED;
+            default:
+                throw new IllegalStateException("Unexpected value: " + stateAction);
+        }
     }
 
 }

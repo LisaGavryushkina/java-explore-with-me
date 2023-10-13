@@ -1,6 +1,8 @@
 package ru.practicum.ewm.user;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -10,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
+
+import static ru.practicum.ewm.user.UserRepository.LikesAndTotal;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,10 @@ public class UserServiceImpl implements UserService {
         } else {
             users = userRepository.findAllByIdIn(ids, new OffsetPageRequest(from, size));
         }
-        return users.map(userMapper::toUserDtoForAdmin).getContent();
+        Map<Integer, LikesAndTotal> likesAndTotalByUserIds = users.stream()
+                .collect(Collectors.toMap(User::getId,
+                        user -> userRepository.countLikesAndTotalForInitiator(user.getId())));
+        return users.map(user -> userMapper.toUserDtoForAdmin(user, likesAndTotalByUserIds.get(user.getId()))).getContent();
     }
 
     @Override
