@@ -12,8 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.Category;
-import ru.practicum.ewm.category.CategoryNotFoundException;
 import ru.practicum.ewm.category.CategoryRepository;
+import ru.practicum.ewm.error_handler.EwmEntityNotFoundException;
 import ru.practicum.ewm.event.dto.EventFiltersForAdmin;
 import ru.practicum.ewm.event.dto.EventFiltersForPublic;
 import ru.practicum.ewm.event.dto.EventForResponseDto;
@@ -25,7 +25,6 @@ import ru.practicum.ewm.event.dto.UpdateRequestsStatusDto;
 import ru.practicum.ewm.event.dto.UpdatedRequestsStatusDto;
 import ru.practicum.ewm.event.exception.EventDateAlreadyPassedException;
 import ru.practicum.ewm.event.exception.EventDateInLessThanAnHourException;
-import ru.practicum.ewm.event.exception.EventNotFoundException;
 import ru.practicum.ewm.event.exception.EventWithNotPendingStateCantBePublished;
 import ru.practicum.ewm.event.exception.NotPendingRequestStatusCantBeUpdated;
 import ru.practicum.ewm.event.exception.PublishedEventCantBeUpdatedException;
@@ -41,7 +40,6 @@ import ru.practicum.ewm.request.Status;
 import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
 import ru.practicum.ewm.stats_service.StatsService;
 import ru.practicum.ewm.user.User;
-import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRatingService;
 import ru.practicum.ewm.user.UserRepository;
 
@@ -71,9 +69,8 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventForResponseDto addEvent(int userId, EventToAddDto eventToAddDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Category category =
-                categoryRepository.findById(eventToAddDto.getCategory()).orElseThrow(() -> new CategoryNotFoundException(eventToAddDto.getCategory()));
+        User user = userRepository.findByIdOrThrow(userId);
+        Category category = categoryRepository.findByIdOrThrow(eventToAddDto.getCategory());
         Event event = eventRepository.save(eventMapper.toEvent(eventToAddDto, category, user,
                 LocalDateTime.now(), State.PENDING));
         return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), 0);
@@ -81,8 +78,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventForResponseDto getEventByInitiator(int userId, int eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        userRepository.checkEntityExists(userId);
+        Event event = eventRepository.findByIdOrThrow(eventId);
         int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), views);
     }
@@ -90,8 +87,8 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventForResponseDto updateEventByInitiator(int userId, int eventId, UpdateEventDto updateEventDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        userRepository.checkEntityExists(userId);
+        Event event = eventRepository.findByIdOrThrow(eventId);
         if (event.getState() == State.PUBLISHED) {
             throw new PublishedEventCantBeUpdatedException(eventId);
         }
@@ -103,8 +100,7 @@ public class EventServiceImpl implements EventService {
         int newCategoryId = updateEventDto.getCategory();
         Category category = event.getCategory();
         if (newCategoryId != category.getId() && newCategoryId != 0) {
-            category =
-                    categoryRepository.findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
+            category = categoryRepository.findByIdOrThrow(newCategoryId);
         }
         Event toUpdate = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
@@ -114,8 +110,8 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<RequestDto> getRequestsForInitiatorEvent(int userId, int eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        userRepository.checkEntityExists(userId);
+        eventRepository.checkEntityExists(eventId);
         List<Request> requests = requestRepository.findAllByEventId(eventId);
         return requests.stream()
                 .map(requestMapper::toRequestDto)
@@ -126,8 +122,8 @@ public class EventServiceImpl implements EventService {
     @Transactional
     public UpdatedRequestsStatusDto updateRequestsStatusByInitiator(int userId, int eventId,
                                                                     UpdateRequestsStatusDto updateRequestsStatusDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        userRepository.checkEntityExists(userId);
+        Event event = eventRepository.findByIdOrThrow(eventId);
         int limit = event.getParticipantLimit();
         if (limit != 0 && limit == event.getConfirmedRequests()) {
             throw new ParticipantLimitExceededException(eventId);
@@ -189,7 +185,7 @@ public class EventServiceImpl implements EventService {
     @Override
     @Transactional
     public EventForResponseDto updateEventByAdmin(int eventId, UpdateEventDto updateEventDto) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        Event event = eventRepository.findByIdOrThrow(eventId);
         LocalDateTime newEventDate = updateEventDto.getEventDate();
         if (newEventDate != null) {
             if (newEventDate.isBefore(LocalDateTime.now())) {
@@ -204,8 +200,7 @@ public class EventServiceImpl implements EventService {
         int newCategoryId = updateEventDto.getCategory();
         Category category = event.getCategory();
         if (newCategoryId != category.getId() && newCategoryId != 0) {
-            category = categoryRepository
-                    .findById(newCategoryId).orElseThrow(() -> new CategoryNotFoundException(newCategoryId));
+            category = categoryRepository.findByIdOrThrow(newCategoryId);
         }
         Event updated = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
@@ -251,9 +246,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventForResponseDto getEventForPublic(int eventId, String uri, String ip) {
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        Event event = eventRepository.findByIdOrThrow(eventId);
         if (event.getState() != State.PUBLISHED) {
-            throw new EventNotFoundException(eventId);
+            throw new EwmEntityNotFoundException(eventId);
         }
         statsService.addHit(uri, ip);
         int views = statsService.getViews(eventId);

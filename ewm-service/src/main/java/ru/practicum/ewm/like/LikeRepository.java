@@ -2,9 +2,9 @@ package ru.practicum.ewm.like;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import ru.practicum.ewm.repository.EwmEntityRepository;
 
-public interface LikeRepository extends JpaRepository<Like, Integer> {
+public interface LikeRepository extends EwmEntityRepository<Like> {
 
     Optional<Like> findByParticipantIdAndEventId(int participantId, int eventId);
 }

@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.ewm.repository.EwmEntityRepository;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends EwmEntityRepository<User> {
 
     Page<User> findAllByIdIn(List<Integer> ids, Pageable pageable);
 
@@ -21,6 +21,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     interface LikesAndTotal {
         int getLikes();
+
         int getTotal();
     }
 }

@@ -1,0 +1,1775 @@
+{
+    "info": {
+        "_postman_id": "ccbc2123-a27e-4028-83a0-b9f31b14e4db",
+        "name": "Test Explore With Me - Likes",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "26811378"
+    },
+    "item": [
+        {
+            "name": "Добавление пользователя 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);\r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const source = JSON.parse(pm.request.body.raw);\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 1').to.eql(1);\r",
+                            "pm.expect(target).to.have.property('name');\r",
+                            "pm.expect(target).to.have.property('email');\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target.rating, '\"rating\" должен быть равен 0.0').to.eql(0.0);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "*/*",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\": \"poly\",\r\n    \"email\": \"poly@user.com\"\r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/users",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "users"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление категории 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);\r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const source = JSON.parse(pm.request.body.raw);\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Категория должна содержать поля: id, name\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 1').to.eql(1);\r",
+                            "pm.expect(target).to.have.property('name');\r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\": \"концерт\" \r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/categories",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "categories"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление события 1 от пользователя 1",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "var moment = require('moment');\r",
+                            "\r",
+                            "var eventDate = moment().add(1, 'd');\r",
+                            "pm.environment.set('eventDate', eventDate.format('YYYY-MM-DD HH:mm:ss'));\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Событие должно содержать поля rating и initiator\", function () {\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target).to.have.property('initiator');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "pm.expect(target.id).to.eql(1, \"Id события должен быть равен 1\");\r",
+                            "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
+                            "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"annotation\" : \"Незабываемый концерт под звездным небом\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"56.81\",\r\n        \"lon\" : \"32.74\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Концерт\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events"
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Публикация события 1 админом",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "    pm.expect(\"PUBLISHED\").equal(target.state, 'Состояние события должно быть \"PUBLISHED\"');\r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"stateAction\" : \"PUBLISH_EVENT\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/events/:eventId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "events",
+                        ":eventId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление пользователя 2",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);\r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const source = JSON.parse(pm.request.body.raw);\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 2').to.eql(2);\r",
+                            "pm.expect(target).to.have.property('name');\r",
+                            "pm.expect(target).to.have.property('email');\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target.rating, '\"rating\" должен быть равен 0.0').to.eql(0.0);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\": \"lisa\",\r\n    \"email\": \"lisa@user.com\"\r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/users",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "users"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление запроса на участие в событии 1 от пользователя 2",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Запрос на участие должен содержать поля: id, requester, event, status, created\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('requester');\r",
+                            "pm.expect(target).to.have.property('event');\r",
+                            "pm.expect(target).to.have.property('status');\r",
+                            "pm.expect(target).to.have.property('created');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"При создании у запроса на участие должен быть статус CONFIRMED\", function () {\r",
+                            "    pm.expect(target.status).equal(\"CONFIRMED\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "requests"
+                    ],
+                    "query": [
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление лайка от пользователя 2 событию 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.id).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(2);\r",
+                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.like).equal(true);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=true",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "true"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "2"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Повторное добавление лайка от пользователя 2 событию 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 409\", function () {\r",
+                            "    pm.response.to.have.status(409);   \r",
+                            "    });\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=true",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "true"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "2"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Получение лайка по id",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(200);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.id).equal(1);\r",
+                            "    pm.expect(target.participantId).equal(2);\r",
+                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.like).equal(true);\r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/admin/likes/:likeId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "likes",
+                        ":likeId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "likeId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Получение события 1 после лайка",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Событие должно содержать поля rating и initiator\", function () {\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target).to.have.property('initiator');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "pm.expect(target.rating).to.eql(10.0, \"Рейтинг события должен быть равен 10.0\");\r",
+                            "pm.expect(target.initiator.rating).to.eql(10.0, \"Рейтинг инициатора события должен быть равен 10.0\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/events/:id",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "events",
+                        ":id"
+                    ],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Удаление лайка по id",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 204\", function () {\r",
+                            "    pm.response.to.have.status(204);   \r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/likes/:likeId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        "likes",
+                        ":likeId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "likeId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Получение удаленного лайка по id",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 404\", function () {\r",
+                            "    pm.response.to.have.status(404);   \r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/admin/likes/:likeId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "likes",
+                        ":likeId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "likeId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление пользователя 3",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);\r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const source = JSON.parse(pm.request.body.raw);\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Пользователь должен содержать поля: id, name, email, rating\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target.id, '\"id\" должен быть равен 3').to.eql(3);\r",
+                            "pm.expect(target).to.have.property('name');\r",
+                            "pm.expect(target).to.have.property('email');\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target.rating, '\"rating\" должен быть равен 0.0').to.eql(0.0);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "*/*",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"name\": \"user3\",\r\n    \"email\": \"user3@user.com\"\r\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/users",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "users"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление дизлайка событию 1  от пользователя 3, не принявшего участие",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 409\", function () {\r",
+                            "    pm.response.to.have.status(409);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=false",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "false"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление запроса на участие в событии 1 от пользователя 3",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Запрос на участие должен содержать поля: id, requester, event, status, created\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('requester');\r",
+                            "pm.expect(target).to.have.property('event');\r",
+                            "pm.expect(target).to.have.property('status');\r",
+                            "pm.expect(target).to.have.property('created');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"При создании у запроса на участие должен быть статус CONFIRMED\", function () {\r",
+                            "    pm.expect(target.status).equal(\"CONFIRMED\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=1",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "requests"
+                    ],
+                    "query": [
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление дизлайка от пользователя 3 событию 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.id).equal(2);\r",
+                            "    pm.expect(target.participantId).equal(3);\r",
+                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.like).equal(false);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=false",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "false"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление лайка после удаления от пользователя 2 событию 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.participantId).equal(2);\r",
+                            "    pm.expect(target.eventId).equal(1);\r",
+                            "    pm.expect(target.like).equal(true);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=true",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "true"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "2"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Получение события 1 после лайка и дизлайка",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Событие должно содержать поля rating и initiator\", function () {\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target).to.have.property('initiator');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "pm.expect(target.rating).to.eql(5.0, \"Рейтинг события должен быть равен 5.0\");\r",
+                            "pm.expect(target.initiator.rating).to.eql(5.0, \"Рейтинг инициатора события должен быть равен 5.0\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/events/:id",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "events",
+                        ":id"
+                    ],
+                    "variable": [
+                        {
+                            "key": "id",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление события 2 от пользователя 2",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "var moment = require('moment');\r",
+                            "\r",
+                            "var eventDate = moment().add(1, 'd');\r",
+                            "pm.environment.set('eventDate', eventDate.format('YYYY-MM-DD HH:mm:ss'));\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Событие должно содержать поля rating и initiator\", function () {\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target).to.have.property('initiator');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "pm.expect(target.id).to.eql(2, \"Id события должен быть равен 2\");\r",
+                            "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
+                            "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"annotation\" : \"Рок-концерт в Albert hall\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"60.10\",\r\n        \"lon\" : \"41.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Рок-концерт\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events"
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Публикация события 2 админом",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "    pm.expect(\"PUBLISHED\").equal(target.state, 'Состояние события должно быть \"PUBLISHED\"');\r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"stateAction\" : \"PUBLISH_EVENT\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/events/:eventId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "events",
+                        ":eventId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "eventId",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление запроса на участие в событии 2 от пользователя 1",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"При создании у запроса на участие должен быть статус CONFIRMED\", function () {\r",
+                            "    pm.expect(target.status).equal(\"CONFIRMED\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=2",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "requests"
+                    ],
+                    "query": [
+                        {
+                            "key": "eventId",
+                            "value": "2"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление запроса на участие в событии 2 от пользователя 3",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"При создании у запроса на участие должен быть статус CONFIRMED\", function () {\r",
+                            "    pm.expect(target.status).equal(\"CONFIRMED\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/requests?eventId=2",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "requests"
+                    ],
+                    "query": [
+                        {
+                            "key": "eventId",
+                            "value": "2"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление лайка от пользователя 1 событию 2",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.participantId).equal(1);\r",
+                            "    pm.expect(target.eventId).equal(2);\r",
+                            "    pm.expect(target.like).equal(true);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=true",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "true"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "1"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление лайка от пользователя 3 событию 2",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Лайк событию должен содержать поля: id, participantId, eventId, isLike\", function () {\r",
+                            "pm.expect(target).to.have.property('id');\r",
+                            "pm.expect(target).to.have.property('participantId');\r",
+                            "pm.expect(target).to.have.property('eventId');\r",
+                            "pm.expect(target).to.have.property('like');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(\"Значения полей лайка должны соотвествовать данным в запросе\", function () {\r",
+                            "    pm.expect(target.participantId).equal(3);\r",
+                            "    pm.expect(target.eventId).equal(2);\r",
+                            "    pm.expect(target.like).equal(true);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events/:eventId/likes?isLike=true",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events",
+                        ":eventId",
+                        "likes"
+                    ],
+                    "query": [
+                        {
+                            "key": "isLike",
+                            "value": "true"
+                        }
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        },
+                        {
+                            "key": "eventId",
+                            "value": "2"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Добавление события 3 от пользователя 3",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            "var moment = require('moment');\r",
+                            "\r",
+                            "var eventDate = moment().add(1, 'd');\r",
+                            "pm.environment.set('eventDate', eventDate.format('YYYY-MM-DD HH:mm:ss'));\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 201 и данные в формате json\", function () {\r",
+                            "    pm.response.to.have.status(201);   \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"Событие должно содержать поля rating и initiator\", function () {\r",
+                            "pm.expect(target).to.have.property('rating');\r",
+                            "pm.expect(target).to.have.property('initiator');\r",
+                            "});\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "pm.expect(target.id).to.eql(3, \"Id события должен быть равен 3\");\r",
+                            "pm.expect(target.rating).to.eql(0.0, \"Рейтинг события должен быть равен 0.0\");\r",
+                            "pm.expect(target.initiator.rating).to.eql(0.0, \"Рейтинг инициатора события должен быть равен 0.0\");\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"annotation\" : \"Сказка на льду в Ледовом Дворце\",\r\n    \"category\" : \"1\",\r\n    \"description\" : \"********************\",\r\n    \"eventDate\" : \"{{eventDate}}\",\r\n    \"location\" : {\r\n        \"lat\" : \"91.10\",\r\n        \"lon\" : \"75.54\"\r\n    },\r\n    \"paid\" : \"true\",\r\n    \"participantLimit\" : \"0\",\r\n    \"requestModeration\" : \"false\",\r\n    \"title\" : \"Сказка на льду\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/users/:userId/events",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "users",
+                        ":userId",
+                        "events"
+                    ],
+                    "variable": [
+                        {
+                            "key": "userId",
+                            "value": "3"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Публикация события 3 админом",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(function () {\r",
+                            "    pm.expect(\"PUBLISHED\").equal(target.state, 'Состояние события должно быть \"PUBLISHED\"');\r",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "PATCH",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\r\n    \"stateAction\" : \"PUBLISH_EVENT\"\r\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/admin/events/:eventId",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "admin",
+                        "events",
+                        ":eventId"
+                    ],
+                    "variable": [
+                        {
+                            "key": "eventId",
+                            "value": "3"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Получение событий с сортировкой по рейтингу public endpoint",
+            "event": [
+                {
+                    "listen": "prerequest",
+                    "script": {
+                        "exec": [
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                },
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "pm.test(\"Ответ должен содержать код статуса 200 и данные в формате json\", function () {\r",
+                            "    pm.response.to.be.ok;    \r",
+                            "    pm.response.to.be.withBody;\r",
+                            "    pm.response.to.be.json;\r",
+                            "});\r",
+                            "\r",
+                            "const target = pm.response.json();\r",
+                            "\r",
+                            "pm.test(\"События должны быть отсортированы по рейтингу в порядке убывания\", function () {\r",
+                            "pm.expect(target.length).to.eql(3);\r",
+                            "pm.expect(target[0].id).to.eql(2);\r",
+                            "pm.expect(target[1].id).to.eql(1);\r",
+                            "pm.expect(target[2].id).to.eql(3);\r",
+                            "pm.expect(target[0].rating).to.eql(10.0);\r",
+                            "pm.expect(target[1].rating).to.eql(5.0);\r",
+                            "pm.expect(target[2].rating).to.eql(0.0);\r",
+                            "});\r",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/events?sort=RATING",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "events"
+                    ],
+                    "query": [
+                        {
+                            "key": "sort",
+                            "value": "RATING"
+                        }
+                    ]
+                },
+                "description": "Обратите внимание: \n- это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события\n- текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв\n- если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени\n- информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие\n- информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики"
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:8080"
+        }
+    ]
+}

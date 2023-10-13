@@ -11,15 +11,12 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.event.State;
-import ru.practicum.ewm.event.exception.EventNotFoundException;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.request.exception.EventNotPublishedException;
 import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
 import ru.practicum.ewm.request.exception.RepeatedRequestException;
 import ru.practicum.ewm.request.exception.RequestFromInitiatorException;
-import ru.practicum.ewm.request.exception.RequestNotFoundException;
 import ru.practicum.ewm.user.User;
-import ru.practicum.ewm.user.UserNotFoundException;
 import ru.practicum.ewm.user.UserRepository;
 
 @Service
@@ -33,7 +30,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestDto> getRequests(int userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        userRepository.checkEntityExists(userId);
         List<Request> requests = requestRepository.findAllByRequesterId(userId);
         return requests.stream()
                 .map(requestMapper::toRequestDto)
@@ -43,12 +40,12 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public RequestDto addRequest(int userId, int eventId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
+        User user = userRepository.findByIdOrThrow(userId);
         boolean isExist = requestRepository.existsByRequesterIdAndEventId(userId, eventId);
         if (isExist) {
             throw new RepeatedRequestException(userId, eventId);
         }
-        Event event = eventRepository.findById(eventId).orElseThrow(() -> new EventNotFoundException(eventId));
+        Event event = eventRepository.findByIdOrThrow(eventId);
         if (event.getInitiator().getId() == userId) {
             throw new RequestFromInitiatorException(userId, eventId);
         }
@@ -73,8 +70,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     @Transactional
     public RequestDto cancelRequest(int userId, int requestId) {
-        Request request =
-                requestRepository.findById(requestId).orElseThrow(() -> new RequestNotFoundException(requestId));
+        Request request = requestRepository.findByIdOrThrow(requestId);
         request.setStatus(Status.CANCELED);
         Request updated = requestRepository.save(request);
         return requestMapper.toRequestDto(updated);
