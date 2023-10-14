@@ -15,5 +15,5 @@ public interface RequestRepository extends EwmEntityRepository<Request> {
 
     List<Request> findAllByEventIdAndStatus(int eventId, Status status);
 
-    Optional<Request> findByRequesterIdAndEventId(int requesterId, int eventId);
+    Optional<Request> findByRequesterIdAndEventIdAndStatus(int requesterId, int eventId, Status status);
 }

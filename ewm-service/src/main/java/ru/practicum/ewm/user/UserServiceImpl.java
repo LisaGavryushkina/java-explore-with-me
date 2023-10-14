@@ -2,7 +2,6 @@ package ru.practicum.ewm.user;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -12,8 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
+import ru.practicum.ewm.rating.RatingService;
 
-import static ru.practicum.ewm.user.UserRepository.LikesAndTotal;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RatingService ratingService;
 
     @Override
     public List<UserDto> getUsers(List<Integer> ids, int from, int size) {
@@ -31,17 +31,17 @@ public class UserServiceImpl implements UserService {
         } else {
             users = userRepository.findAllByIdIn(ids, new OffsetPageRequest(from, size));
         }
-        Map<Integer, LikesAndTotal> likesAndTotalByUserIds = users.stream()
-                .collect(Collectors.toMap(User::getId,
-                        user -> userRepository.countLikesAndTotalForInitiator(user.getId())));
-        return users.map(user -> userMapper.toUserDtoForAdmin(user, likesAndTotalByUserIds.get(user.getId()))).getContent();
+        List<Integer> userIds = users.map(User::getId).getContent();
+        Map<Integer, Float> ratingsByUserIds = ratingService.getLikesAndTotalForUser(userIds);
+        return users.map(user -> userMapper.toUserDtoForAdmin(user,
+                ratingsByUserIds.getOrDefault(user.getId(), 0.0f))).getContent();
     }
 
     @Override
     @Transactional
     public UserDto addUser(UserDto userDto) {
         User user = userRepository.save(userMapper.toUser(userDto));
-        return userMapper.toUserDtoForAdmin(user);
+        return userMapper.toUserDtoForAdminWithoutRating(user);
     }
 
     @Override

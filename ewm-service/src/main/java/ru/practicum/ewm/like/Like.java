@@ -31,10 +31,10 @@ public class Like {
     private User participant;
 
     @ManyToOne
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @JoinColumn(name = "is_like")
+    @JoinColumn(name = "is_like", nullable = false)
     private boolean isLike;
 
 }

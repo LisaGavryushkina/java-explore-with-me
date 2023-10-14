@@ -14,8 +14,6 @@ import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventMapper;
 import ru.practicum.ewm.event.dto.EventShortedForResponseDto;
 
-import static ru.practicum.ewm.user.UserRepository.LikesAndTotal;
-
 @Component
 @RequiredArgsConstructor
 public class CompilationMapper {
@@ -34,10 +32,11 @@ public class CompilationMapper {
     }
 
     public CompilationForResponseDto toCompilationForResponseDto(Compilation compilation, List<Event> events,
-                                                                 Map<Integer, LikesAndTotal> likesAndTotalByUserIds,
-                                                                 Map<Integer, Integer> viewsByEventIds) {
-        List<EventShortedForResponseDto> shorted = eventMapper.toShortedEventDto(events, likesAndTotalByUserIds,
-                viewsByEventIds);
+                                                                 Map<Integer, Float> ratingsByUserIds,
+                                                                 Map<Integer, Integer> viewsByEventIds,
+                                                                 Map<Integer, Float> ratingsByEventIds) {
+        List<EventShortedForResponseDto> shorted = eventMapper.toShortedEventDto(events, ratingsByUserIds,
+                viewsByEventIds, ratingsByEventIds);
         return new CompilationForResponseDto(compilation.getId(),
                 compilation.isPinned(),
                 compilation.getTitle(),
@@ -62,14 +61,16 @@ public class CompilationMapper {
 
     public List<CompilationForResponseDto> toCompilationForResponseDto(List<Compilation> compilations,
                                                                        Map<Integer, List<Event>> eventsByCompilationIds,
-                                                                       Map<Integer, LikesAndTotal> likesAndTotalByUserIds,
-                                                                       Map<Integer, Integer> viewsByEventIds) {
+                                                                       Map<Integer, Float> ratingsByUserIds,
+                                                                       Map<Integer, Integer> viewsByEventIds,
+                                                                       Map<Integer, Float> ratingsByEventIds) {
         return compilations.stream()
                 .map(compilation -> toCompilationForResponseDto(
                         compilation,
                         eventsByCompilationIds.getOrDefault(compilation.getId(), Collections.emptyList()),
-                        likesAndTotalByUserIds,
-                        viewsByEventIds))
+                        ratingsByUserIds,
+                        viewsByEventIds,
+                        ratingsByEventIds))
                 .collect(Collectors.toList());
     }
 }

@@ -96,18 +96,13 @@ public class Event {
     @Size(max = 120)
     private String title;
 
-    @Formula("(select count(*) from likes as l where l.event_id = id and l.is_like = true)")
-    private int likes;
-
-    @Formula("(select count(*) from likes as l where l.event_id = id and l.is_like = false)")
-    private int dislikes;
-
-    public float getRating() {
-        if (likes == 0) {
-            return 0.0F;
-        }
-        return (float) likes / (likes + dislikes) * 10;
-    }
+//    @Formula("( select case rating.total " +
+//            " when 0 then 0 " +
+//            " else rating.count_likes::float / rating.total end " +
+//            " from ( select count(case when l.is_like then 1.0 end) as count_likes, count(*) as total " +
+//            "        from likes as l " +
+//            "        where l.event_id = id ) rating )")
+//    private float rating;
 
     @Override
     public boolean equals(Object o) {

@@ -1,39 +1,29 @@
 package ru.practicum.ewm.user;
 
 import org.springframework.stereotype.Component;
-import ru.practicum.ewm.user.UserRepository.LikesAndTotal;
 
 @Component
 public class UserMapper {
 
-    private float getRating(LikesAndTotal likesAndTotal) {
-        int likes = likesAndTotal.getLikes();
-        int total = likesAndTotal.getTotal();
-        if (likes == 0) {
-            return 0.0F;
-        }
-        return (float) likes / total;
-    }
-
-    public UserDto toUserDtoForAdmin(User user, LikesAndTotal likesAndTotal) {
+    public UserDto toUserDtoForAdmin(User user, float rating) {
         return new UserDto(user.getId(),
                 user.getName(),
                 user.getEmail(),
-                getRating(likesAndTotal));
+                rating);
     }
 
-    public UserDto toUserDtoForAdmin(User user) {
+    public UserDto toUserDtoForAdminWithoutRating(User user) {
         return new UserDto(user.getId(),
                 user.getName(),
                 user.getEmail(),
-                0.0F);
+                0.0f);
     }
 
-    public UserDto toUserDto(User user, LikesAndTotal likesAndTotal) {
+    public UserDto toUserDto(User user, float rating) {
         return new UserDto(user.getId(),
                 user.getName(),
                 null,
-                getRating(likesAndTotal));
+                rating);
     }
 
     public User toUser(UserDto userDto) {

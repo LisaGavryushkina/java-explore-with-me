@@ -17,8 +17,6 @@ import ru.practicum.ewm.event.dto.UpdateEventDto;
 import ru.practicum.ewm.user.User;
 import ru.practicum.ewm.user.UserMapper;
 
-import static ru.practicum.ewm.user.UserRepository.LikesAndTotal;
-
 @Component
 @RequiredArgsConstructor
 public class EventMapper {
@@ -26,8 +24,9 @@ public class EventMapper {
     private final UserMapper userMapper;
 
     public List<EventShortedForResponseDto> toShortedEventDto(List<Event> events,
-                                                              Map<Integer, LikesAndTotal> likesAndTotalByUserIds,
-                                                              Map<Integer, Integer> viewsByEventIds) {
+                                                              Map<Integer, Float> ratingsByUserIds,
+                                                              Map<Integer, Integer> viewsByEventIds,
+                                                              Map<Integer, Float> ratingsByEventIds) {
         return events.stream()
                 .map(event -> new EventShortedForResponseDto(event.getId(),
                         event.getAnnotation(),
@@ -35,17 +34,18 @@ public class EventMapper {
                         event.getConfirmedRequests(),
                         event.getEventDate(),
                         userMapper.toUserDto(event.getInitiator(),
-                                likesAndTotalByUserIds.get(event.getInitiator().getId())),
+                                ratingsByUserIds.getOrDefault(event.getInitiator().getId(), 0.0f)),
                         event.isPaid(),
                         event.getTitle(),
                         viewsByEventIds.getOrDefault(event.getId(), 0),
-                        event.getRating()))
+                        ratingsByEventIds.getOrDefault(event.getId(), 0.0f)))
                 .collect(Collectors.toList());
     }
 
     public List<EventShortedForResponseDto> toShortedEventDtoForInitiator(List<Event> events,
-                                                                          LikesAndTotal likesAndTotal,
-                                                                          Map<Integer, Integer> viewsByEventIds) {
+                                                                          float userRating,
+                                                                          Map<Integer, Integer> viewsByEventIds,
+                                                                          Map<Integer, Float> ratingsByEventIds) {
         return events.stream()
                 .map(event -> new EventShortedForResponseDto(event.getId(),
                         event.getAnnotation(),
@@ -53,26 +53,26 @@ public class EventMapper {
                         event.getConfirmedRequests(),
                         event.getEventDate(),
                         userMapper.toUserDto(event.getInitiator(),
-                                likesAndTotal),
+                                userRating),
                         event.isPaid(),
                         event.getTitle(),
                         viewsByEventIds.getOrDefault(event.getId(), 0),
-                        event.getRating()))
+                        ratingsByEventIds.getOrDefault(event.getId(), 0.0f)))
                 .collect(Collectors.toList());
 
     }
 
-    public EventShortedForResponseDto toShortedEventDto(Event event, LikesAndTotal likesAndTotal, int views) {
+    public EventShortedForResponseDto toShortedEventDto(Event event, float userRating, int views, float eventRating) {
         return new EventShortedForResponseDto(event.getId(),
                 event.getAnnotation(),
                 categoryMapper.toCategoryDto(event.getCategory()),
                 event.getConfirmedRequests(),
                 event.getEventDate(),
-                userMapper.toUserDto(event.getInitiator(), likesAndTotal),
+                userMapper.toUserDto(event.getInitiator(), userRating),
                 event.isPaid(),
                 event.getTitle(),
                 views,
-                event.getRating());
+                eventRating);
     }
 
     public Event toEvent(EventToAddDto eventForRequestDto, Category category, User user, LocalDateTime now,
@@ -92,12 +92,10 @@ public class EventMapper {
                 null,
                 eventForRequestDto.isRequestModeration(),
                 state,
-                eventForRequestDto.getTitle(),
-                0,
-                0);
+                eventForRequestDto.getTitle());
     }
 
-    public EventForResponseDto toEventForResponseDto(Event event, LikesAndTotal likesAndTotal, int views) {
+    public EventForResponseDto toEventForResponseDto(Event event, float userRating, int views, float eventRating) {
         return new EventForResponseDto(event.getId(),
                 event.getAnnotation(),
                 categoryMapper.toCategoryDto(event.getCategory()),
@@ -105,7 +103,7 @@ public class EventMapper {
                 event.getCreatedOn(),
                 event.getDescription(),
                 event.getEventDate(),
-                userMapper.toUserDto(event.getInitiator(), likesAndTotal),
+                userMapper.toUserDto(event.getInitiator(), userRating),
                 new Location(event.getLat(), event.getLon()),
                 event.isPaid(),
                 event.getParticipantLimit(),
@@ -114,15 +112,19 @@ public class EventMapper {
                 event.getState(),
                 event.getTitle(),
                 views,
-                event.getRating());
+                eventRating);
     }
 
     public List<EventForResponseDto> toEventForResponseDto(List<Event> events,
-                                                           Map<Integer, LikesAndTotal> likesAndTotalByUserIds,
-                                                           Map<Integer, Integer> eventIdsAndViews) {
+                                                           Map<Integer, Float> ratingsByUserIds,
+                                                           Map<Integer, Integer> eventIdsAndViews,
+                                                           Map<Integer, Float> ratingsByEventIds) {
         return events.stream()
-                .map(event -> toEventForResponseDto(event, likesAndTotalByUserIds.get(event.getInitiator().getId()),
-                        eventIdsAndViews.getOrDefault(event.getId(), 0)))
+                .map(event -> toEventForResponseDto(
+                        event,
+                        ratingsByUserIds.getOrDefault(event.getInitiator().getId(), 0.0f),
+                        eventIdsAndViews.getOrDefault(event.getId(), 0),
+                        ratingsByEventIds.getOrDefault(event.getId(), 0.0f)))
                 .collect(Collectors.toList());
     }
 
@@ -162,4 +164,5 @@ public class EventMapper {
         event.setState(state);
         return event;
     }
+
 }

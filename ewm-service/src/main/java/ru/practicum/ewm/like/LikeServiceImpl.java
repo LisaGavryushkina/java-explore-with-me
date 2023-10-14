@@ -31,8 +31,9 @@ public class LikeServiceImpl implements LikeService {
     public LikeDto addLike(int participantId, int eventId, boolean isLike) {
         User participant = userRepository.findByIdOrThrow(participantId);
         Event event = eventRepository.findByIdOrThrow(eventId);
-        Optional<Request> optionalRequest = requestRepository.findByRequesterIdAndEventId(participantId, eventId);
-        if (optionalRequest.isEmpty() || optionalRequest.get().getStatus() != Status.CONFIRMED) {
+        Optional<Request> optionalRequest = requestRepository.findByRequesterIdAndEventIdAndStatus(participantId,
+                eventId, Status.CONFIRMED);
+        if (optionalRequest.isEmpty()) {
             throw new OnlyParticipantsCanRateEventException();
         }
         Optional<Like> optionalLike = likeRepository.findByParticipantIdAndEventId(participantId, eventId);

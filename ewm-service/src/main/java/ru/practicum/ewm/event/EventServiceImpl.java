@@ -31,6 +31,7 @@ import ru.practicum.ewm.event.specification.EventForAdminSpecification;
 import ru.practicum.ewm.event.specification.EventForPublicSpecification;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
+import ru.practicum.ewm.rating.RatingService;
 import ru.practicum.ewm.request.Request;
 import ru.practicum.ewm.request.RequestDto;
 import ru.practicum.ewm.request.RequestMapper;
@@ -39,7 +40,6 @@ import ru.practicum.ewm.request.Status;
 import ru.practicum.ewm.request.exception.ParticipantLimitExceededException;
 import ru.practicum.ewm.stats_service.StatsService;
 import ru.practicum.ewm.user.User;
-import ru.practicum.ewm.user.UserRatingService;
 import ru.practicum.ewm.user.UserRepository;
 
 @Service
@@ -50,7 +50,7 @@ public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
     private final UserRepository userRepository;
-    private final UserRatingService userRatingService;
+    private final RatingService ratingService;
     private final RequestRepository requestRepository;
     private final RequestMapper requestMapper;
     private final CategoryRepository categoryRepository;
@@ -61,8 +61,9 @@ public class EventServiceImpl implements EventService {
         Page<Event> events = eventRepository.findAllByInitiatorId(userId, new OffsetPageRequest(from, size));
         Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.map(Event::getId).getContent());
         return eventMapper.toShortedEventDtoForInitiator(events.getContent(),
-                userRatingService.getLikesAndTotal(userId),
-                viewsByEventIds);
+                ratingService.getLikesAndTotalForUser(userId),
+                viewsByEventIds,
+                ratingService.getLikesAndTotalForEvent(events.getContent()));
     }
 
     @Override
@@ -72,7 +73,7 @@ public class EventServiceImpl implements EventService {
         Category category = categoryRepository.findByIdOrThrow(eventToAddDto.getCategory());
         Event event = eventRepository.save(eventMapper.toEvent(eventToAddDto, category, user,
                 LocalDateTime.now(), State.PENDING));
-        return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), 0);
+        return eventMapper.toEventForResponseDto(event, ratingService.getLikesAndTotalForUser(userId), 0, 0.0f);
     }
 
     @Override
@@ -80,7 +81,8 @@ public class EventServiceImpl implements EventService {
         userRepository.checkEntityExists(userId);
         Event event = eventRepository.findByIdOrThrow(eventId);
         int views = statsService.getViews(eventId);
-        return eventMapper.toEventForResponseDto(event, userRatingService.getLikesAndTotal(userId), views);
+        return eventMapper.toEventForResponseDto(event, ratingService.getLikesAndTotalForUser(userId), views,
+                ratingService.getLikesAndTotalForEvent(eventId));
     }
 
     @Override
@@ -104,7 +106,7 @@ public class EventServiceImpl implements EventService {
         Event toUpdate = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(eventRepository.save(toUpdate),
-                userRatingService.getLikesAndTotal(userId), views);
+                ratingService.getLikesAndTotalForUser(userId), views, ratingService.getLikesAndTotalForEvent(eventId));
     }
 
     @Override
@@ -179,7 +181,8 @@ public class EventServiceImpl implements EventService {
         Map<Integer, Integer> viewsByEventIds = statsService.getViews(events.stream()
                 .map(Event::getId)
                 .collect(Collectors.toList()));
-        return eventMapper.toEventForResponseDto(events, userRatingService.getLikesAndTotal(events), viewsByEventIds);
+        return eventMapper.toEventForResponseDto(events, ratingService.getLikesAndTotalForUser(events),
+                viewsByEventIds, ratingService.getLikesAndTotalForEvent(events));
     }
 
     @Override
@@ -205,7 +208,8 @@ public class EventServiceImpl implements EventService {
         Event updated = eventMapper.updateEvent(event, updateEventDto, category, state);
         int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(eventRepository.save(updated),
-                userRatingService.getLikesAndTotal(event.getInitiator().getId()), views);
+                ratingService.getLikesAndTotalForUser(event.getInitiator().getId()), views,
+                ratingService.getLikesAndTotalForEvent(eventId));
     }
 
     @Override
@@ -218,6 +222,7 @@ public class EventServiceImpl implements EventService {
         Map<Integer, Integer> viewsByEventId = statsService.getViews(events.stream()
                 .map(Event::getId)
                 .collect(Collectors.toList()));
+        Map<Integer, Float> ratingsByEventIds = ratingService.getLikesAndTotalForEvent(events);
         Comparator<Event> comparator;
         switch (sort) {
             case EVENT_DATE:
@@ -228,7 +233,9 @@ public class EventServiceImpl implements EventService {
                         Comparator.<Event>comparingInt(event -> viewsByEventId.getOrDefault(event.getId(), 0)).reversed();
                 break;
             case RATING:
-                comparator = Comparator.<Event>comparingDouble(Event::getRating).reversed();
+                comparator =
+                        Comparator.<Event>comparingDouble(event -> ratingsByEventIds.getOrDefault(event.getId(), 0.0f))
+                                .reversed();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + sort);
@@ -240,8 +247,9 @@ public class EventServiceImpl implements EventService {
                 .collect(Collectors.toList());
         statsService.addHit(uri, ip);
         return eventMapper.toShortedEventDto(eventsToReturn,
-                userRatingService.getLikesAndTotal(eventsToReturn),
-                viewsByEventId);
+                ratingService.getLikesAndTotalForUser(eventsToReturn),
+                viewsByEventId,
+                ratingsByEventIds);
     }
 
     @Override
@@ -253,8 +261,8 @@ public class EventServiceImpl implements EventService {
         statsService.addHit(uri, ip);
         int views = statsService.getViews(eventId);
         return eventMapper.toEventForResponseDto(event,
-                userRatingService.getLikesAndTotal(event.getInitiator().getId()),
-                views);
+                ratingService.getLikesAndTotalForUser(event.getInitiator().getId()),
+                views, ratingService.getLikesAndTotalForEvent(eventId));
     }
 
     private State determineStateForInitiator(StateAction stateAction) {

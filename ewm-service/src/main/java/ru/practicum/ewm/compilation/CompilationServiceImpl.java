@@ -17,8 +17,8 @@ import ru.practicum.ewm.event.Event;
 import ru.practicum.ewm.event.EventRepository;
 import ru.practicum.ewm.log.Logged;
 import ru.practicum.ewm.pageable.OffsetPageRequest;
+import ru.practicum.ewm.rating.RatingService;
 import ru.practicum.ewm.stats_service.StatsService;
-import ru.practicum.ewm.user.UserRatingService;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
@@ -32,7 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final CompilationMapper compilationMapper;
     private final EventRepository eventRepository;
-    private final UserRatingService userRatingService;
+    private final RatingService ratingService;
     private final StatsService statsService;
 
     @Override
@@ -46,7 +46,8 @@ public class CompilationServiceImpl implements CompilationService {
                     events);
             compilationAndEventRepository.saveAll(compilationsAndEvents);
             return compilationMapper.toCompilationForResponseDto(compilation, events,
-                    userRatingService.getLikesAndTotal(events), statsService.getViews(eventIds));
+                    ratingService.getLikesAndTotalForUser(events), statsService.getViews(eventIds),
+                    ratingService.getLikesAndTotalForEvent(events));
         }
         return compilationMapper.toCompilationForResponseDto(compilation);
     }
@@ -78,7 +79,8 @@ public class CompilationServiceImpl implements CompilationService {
                 .map(Event::getId)
                 .collect(toList()));
         return compilationMapper.toCompilationForResponseDto(updated, events,
-                userRatingService.getLikesAndTotal(events), viewsByEventIds);
+                ratingService.getLikesAndTotalForUser(events), viewsByEventIds,
+                ratingService.getLikesAndTotalForEvent(events));
     }
 
     @Override
@@ -98,7 +100,8 @@ public class CompilationServiceImpl implements CompilationService {
                 .flatMap(Collection::stream)
                 .collect(toList());
         return compilationMapper.toCompilationForResponseDto(compilations, eventsByCompilationIds,
-                userRatingService.getLikesAndTotal(events), viewsByEventIds);
+                ratingService.getLikesAndTotalForUser(events), viewsByEventIds,
+                ratingService.getLikesAndTotalForEvent(events));
     }
 
     @Override
@@ -109,6 +112,7 @@ public class CompilationServiceImpl implements CompilationService {
                 .map(Event::getId)
                 .collect(toList()));
         return compilationMapper.toCompilationForResponseDto(compilation, events,
-                userRatingService.getLikesAndTotal(events), viewsByEventIds);
+                ratingService.getLikesAndTotalForUser(events), viewsByEventIds,
+                ratingService.getLikesAndTotalForEvent(events));
     }
 }
