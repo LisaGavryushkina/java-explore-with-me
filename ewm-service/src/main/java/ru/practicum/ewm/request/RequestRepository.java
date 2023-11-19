@@ -1,10 +1,11 @@
 package ru.practicum.ewm.request;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import ru.practicum.ewm.repository.EwmEntityRepository;
 
-public interface RequestRepository extends JpaRepository<Request, Integer> {
+public interface RequestRepository extends EwmEntityRepository<Request> {
 
     List<Request> findAllByRequesterId(int userId);
 
@@ -14,4 +15,5 @@ public interface RequestRepository extends JpaRepository<Request, Integer> {
 
     List<Request> findAllByEventIdAndStatus(int eventId, Status status);
 
+    Optional<Request> findByRequesterIdAndEventIdAndStatus(int requesterId, int eventId, Status status);
 }

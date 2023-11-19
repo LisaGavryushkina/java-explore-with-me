@@ -19,4 +19,5 @@ public class UserDto {
     @Pattern(regexp = "^[\\p{L}0-9!#$%&'*+/=?^_`{|}~-][\\p{L}0-9.!#$%&'*+/=?^_`{|}~-]{0,63}@[\\p{L}0-9-]{0,63}+(?:\\" +
             ".[\\p{L}0-9-]{2,63})*$", message = "Введенный email не соответсвует формату")
     private final String email;
+    private final float rating;
 }

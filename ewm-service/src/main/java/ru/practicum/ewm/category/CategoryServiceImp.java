@@ -30,7 +30,7 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional
     public CategoryDto deleteCategory(int catId) {
-        Category category = categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
+        Category category = categoryRepository.findByIdOrThrow(catId);
         List<Event> categoryEvents = eventRepository.findAllByCategoryId(catId);
         if (!categoryEvents.isEmpty()) {
             throw new CategoryIsNotEmptyException(catId);
@@ -42,8 +42,7 @@ public class CategoryServiceImp implements CategoryService {
     @Override
     @Transactional
     public CategoryDto updateCategory(int catId, CategoryDto categoryDto) {
-        Category category =
-                categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
+        Category category = categoryRepository.findByIdOrThrow(catId);
         category.setName(categoryDto.getName());
         Category categoryUpdated = categoryRepository.save(category);
         return categoryMapper.toCategoryDto(categoryUpdated);
@@ -56,7 +55,7 @@ public class CategoryServiceImp implements CategoryService {
 
     @Override
     public CategoryDto getCategory(int catId) {
-        Category category = categoryRepository.findById(catId).orElseThrow(() -> new CategoryNotFoundException(catId));
+        Category category = categoryRepository.findByIdOrThrow(catId);
         return categoryMapper.toCategoryDto(category);
     }
 }

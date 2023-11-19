@@ -32,9 +32,11 @@ public class CompilationMapper {
     }
 
     public CompilationForResponseDto toCompilationForResponseDto(Compilation compilation, List<Event> events,
-                                                                 Map<Integer, Integer> viewsByEventIds) {
-        List<EventShortedForResponseDto> shorted = eventMapper.toShortedEventDto(events,
-                viewsByEventIds);
+                                                                 Map<Integer, Float> ratingsByUserIds,
+                                                                 Map<Integer, Integer> viewsByEventIds,
+                                                                 Map<Integer, Float> ratingsByEventIds) {
+        List<EventShortedForResponseDto> shorted = eventMapper.toShortedEventDto(events, ratingsByUserIds,
+                viewsByEventIds, ratingsByEventIds);
         return new CompilationForResponseDto(compilation.getId(),
                 compilation.isPinned(),
                 compilation.getTitle(),
@@ -59,12 +61,16 @@ public class CompilationMapper {
 
     public List<CompilationForResponseDto> toCompilationForResponseDto(List<Compilation> compilations,
                                                                        Map<Integer, List<Event>> eventsByCompilationIds,
-                                                                       Map<Integer, Integer> viewsByEventIds) {
+                                                                       Map<Integer, Float> ratingsByUserIds,
+                                                                       Map<Integer, Integer> viewsByEventIds,
+                                                                       Map<Integer, Float> ratingsByEventIds) {
         return compilations.stream()
                 .map(compilation -> toCompilationForResponseDto(
                         compilation,
                         eventsByCompilationIds.getOrDefault(compilation.getId(), Collections.emptyList()),
-                        viewsByEventIds))
+                        ratingsByUserIds,
+                        viewsByEventIds,
+                        ratingsByEventIds))
                 .collect(Collectors.toList());
     }
 }

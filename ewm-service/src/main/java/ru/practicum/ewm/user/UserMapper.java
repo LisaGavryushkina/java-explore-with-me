@@ -5,16 +5,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    public UserDto toUserDtoForAdmin(User user) {
+    public UserDto toUserDtoForAdmin(User user, float rating) {
         return new UserDto(user.getId(),
                 user.getName(),
-                user.getEmail());
+                user.getEmail(),
+                rating);
     }
 
-    public UserDto toUserDto(User user) {
+    public UserDto toUserDtoForAdminWithoutRating(User user) {
         return new UserDto(user.getId(),
                 user.getName(),
-                null);
+                user.getEmail(),
+                0.0f);
+    }
+
+    public UserDto toUserDto(User user, float rating) {
+        return new UserDto(user.getId(),
+                user.getName(),
+                null,
+                rating);
     }
 
     public User toUser(UserDto userDto) {
